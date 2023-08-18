@@ -7,7 +7,7 @@ const navigation = [
   { name: 'Data Portal', href: 'https://data.igvf.org/' },
 ]
 
-export default function Example() {
+export default function Home() {
 
   return (
     <div className="bg-white">
@@ -60,3 +60,22 @@ export default function Example() {
     </div>
   )
 }
+
+// query: 1433B_
+
+const resp = [
+  {
+    name: "1433B_HUMAN",
+    type: "protein"
+  },
+  {
+    name: "1433B_MOUSE", // example protein
+    type: "protein"
+  },
+  {
+    name: "1433B_OTHER", // example transcript
+    type: "transcript"
+  }
+]
+
+

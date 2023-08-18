@@ -5,7 +5,7 @@ export default async function Page({
 }: {
     params: { id: string; };
 }) {
-    const proteinData = await api.proteins.query({ name: id });
+    const proteinData = await api.proteinID.query({ id });
 
     return (
         <div>

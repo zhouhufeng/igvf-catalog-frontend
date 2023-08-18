@@ -1,13 +1,14 @@
 import { PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { AutocompleteResp } from "@/lib/services/AutocompleteService";
 
 export interface SearchHistoryEntry {
-    query: string;
+    result: AutocompleteResp;
     timestamp: number;
 }
 
 const searchHistoryAdapter = createEntityAdapter<SearchHistoryEntry>({
-    selectId: (entry) => entry.timestamp + entry.query,
+    selectId: (entry) => entry.timestamp + entry.result.uri,
     sortComparer: (a, b) => b.timestamp - a.timestamp,
 });
 
