@@ -59,6 +59,8 @@ const typeToEmoji: TypeToEmoji = {
 
 type ResultStatus = "idle" | "loading" | "fulfilled" | "empty";
 
+type SlashCommandType = QueryType;
+
 export default function MainSearchBar() {
     const dispatch = useAppDispatch();
     const searchQuery = useAppSelector(selectSearchQuery);
@@ -68,8 +70,12 @@ export default function MainSearchBar() {
     const [focused, setFocused] = useState(false);
     const [resultsStatus, setResultsStatus] = useState<ResultStatus>("idle");
     const [results, setResults] = useState<AutocompleteResp[]>([]);
+    const [slashCommand, setSlashCommand] = useState<SlashCommandType | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const textFieldRef = useRef<HTMLInputElement>(null);
+
+    const allSlashCommands: SlashCommandType[] = AutocompleteService.allTypes;
 
     const renderSearchSuggestions = () => {
         if (resultsStatus === "loading") return (
@@ -114,7 +120,7 @@ export default function MainSearchBar() {
             return suggestions;
         }
 
-        if (recentSearches.length > 0) {
+        if (!searchQuery.startsWith('/') && recentSearches.length > 0) {
             suggestions.push(
                 <SearchSuggestionDivider text="Recent Searches" key="recentSearches" />
             );
@@ -149,15 +155,20 @@ export default function MainSearchBar() {
         suggestions.push(
             <SearchSuggestionDivider text="Filters" key="filters" />
         );
-
-        AutocompleteService.allTypes.forEach((type) => {
+        let renderedCommands = allSlashCommands;
+        if (searchQuery.startsWith('/')) {
+            renderedCommands = allSlashCommands.filter((type) => type.startsWith(searchQuery.slice(1)));
+        }
+        renderedCommands.forEach((type) => {
             suggestions.push(
                 <SearchSuggestionBase
                     icon={<div className="text-gray-500 text-sm">{typeToEmoji[type] || '🔎'}</div>}
                     text={`/${type}`}
                     desc="Search by type"
                     onClick={() => {
-                        dispatch(setSearchQuery(`/${type}`));
+                        setSlashCommand(type);
+                        dispatch(setSearchQuery(""));
+                        textFieldRef.current?.focus();
                     }}
                     key={`filter-${type}`}
                 />
@@ -168,25 +179,45 @@ export default function MainSearchBar() {
     }
 
     const updateSearch = async (query: string) => {
-        if (!query.length) {
+        if (!query.length || query.startsWith('/')) {
             setResultsStatus("idle");
             setResults([]);
             return;
         }
-        const data = await AutocompleteService.getAutocompleteResults(query);
+        let data;
+        if (slashCommand && AutocompleteService.allTypes.includes(slashCommand)) {
+            data = await AutocompleteService.getAutocompleteResults(query, slashCommand);
+        } else {
+            data = await AutocompleteService.getAutocompleteResults(query);
+        }
 
         setResults(data);
 
         setResultsStatus(data.length > 0 ? "fulfilled" : "empty");
     };
 
-    const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), []);
+    const handleClear = () => {
+        dispatch(setSearchQuery(""));
+        setSlashCommand(null);
+        setFocused(false);
+    }
+
+    const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), [searchQuery]);
 
     useEffect(() => {
-        debouncedUpdateSearch(searchQuery);
-        if (searchQuery.length > 0) {
-            setResultsStatus("loading");
-            setFocused(true);
+        if (searchQuery.startsWith('/')) {
+            updateSearch(searchQuery);
+            if (allSlashCommands.includes(searchQuery.slice(1) as any)) {
+                setSlashCommand(searchQuery.slice(1) as SlashCommandType);
+                setResultsStatus("idle");
+                dispatch(setSearchQuery(""));
+            }
+        } else {
+            debouncedUpdateSearch(searchQuery);
+            if (searchQuery.length > 0) {
+                setResultsStatus("loading");
+                setFocused(true);
+            }
         }
     }, [searchQuery]);
 
@@ -207,33 +238,47 @@ export default function MainSearchBar() {
     return (
         <div className="relative" ref={containerRef}>
             <div className="relative mt-2 rounded-2xl shadow-sm">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                </div>
-                <input
-                    type="text"
-                    id="search-query"
+                <div
                     className={classNames(
-                        "outline-none block w-full text-2xl rounded-2xl h-14 border-0 py-1.5 pl-11 pr-11 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400sm:text-sm sm:leading-6",
+                        "flex flex-row items-center outline-none bg-white w-full rounded-2xl h-14 border-0 pr-11 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400sm:text-sm sm:leading-6",
                         { "rounded-b-none": expanded }
                     )}
-                    placeholder="1433B_HUMAN, rs78196225..."
-                    onFocus={() => setFocused(true)}
-                    onChange={(e) => {
-                        dispatch(setSearchQuery(e.target.value));
-                    }}
-                    value={searchQuery}
-                    autoComplete="off"
-                />
+                >
+                    {!slashCommand ? (
+                        <div className="pointer-events-none inset-y-0 left-0 flex items-center pl-3 pr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                            </svg>
+                        </div>
+                    ) : (
+                        <h1 className="text-2xl ml-2 pl-2 pr-2 mr-2 py-1 bg-purple-300 rounded-2xl">/{slashCommand}</h1>
+                    )}
+                    <input
+                        type="text"
+                        id="search-query"
+                        ref={textFieldRef}
+                        className={classNames(
+                            "outline-none block text-2xl flex-1 rounded-2xl border-0 py-1.5",
+                            { "rounded-b-none": expanded }
+                        )}
+                        placeholder="1433B_HUMAN, rs78196225..."
+                        onFocus={() => setFocused(true)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Backspace" && searchQuery.length === 0) {
+                                setSlashCommand(null);
+                            }
+                        }}
+                        onChange={(e) => {
+                            dispatch(setSearchQuery(e.target.value));
+                        }}
+                        value={searchQuery}
+                        autoComplete="off"
+                    />
+                </div>
                 {(searchQuery.length > 0 || focused) && (
                     <div
                         className="cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3"
-                        onClick={() => {
-                            dispatch(setSearchQuery(""));
-                            setFocused(false);
-                        }}
+                        onClick={handleClear}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
