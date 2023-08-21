@@ -202,7 +202,7 @@ export default function MainSearchBar() {
         setFocused(false);
     }
 
-    const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), [searchQuery]);
+    const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), [slashCommand]);
 
     useEffect(() => {
         if (searchQuery.startsWith('/')) {
