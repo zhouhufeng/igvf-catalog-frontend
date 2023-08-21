@@ -8,7 +8,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
         <>
             <ReduxProvider>
                 {children}
-                <Next13ProgressBar height="2px" color="#ef106a" options={{ showSpinner: false }} showOnShallow />
+                <Next13ProgressBar height="4px" color="#ef106a" options={{ showSpinner: false }} showOnShallow />
             </ReduxProvider>
         </>
     );

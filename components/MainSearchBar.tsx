@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { addSearchHistoryEntry, selectSearchHistory, selectSearchQuery, setSearchQuery } from "@/app/_redux/slices/searchSlice";
+import { addSearchHistoryEntry, deleteAtTimestamp, selectSearchHistory, selectSearchQuery, setSearchQuery } from "@/app/_redux/slices/searchSlice";
 import AutocompleteService, { AutocompleteResp, QueryType } from "@/lib/services/AutocompleteService";
 import { debounce } from "@/lib/utils";
 import classNames from "classnames";
@@ -19,22 +19,29 @@ function SearchSuggestionBase({
     icon,
     text,
     desc,
+    rightAdornment,
     onClick,
 }: {
     icon: React.ReactNode;
     text: string;
     desc: string;
+    rightAdornment?: React.ReactNode;
     onClick: () => void;
 }) {
     return (
         <div
-            className="flex items-center gap-x-2 cursor-pointer"
+            className="cursor-pointer hover:bg-gray-100 p-1 rounded-xl flex flex-row justify-between items-center"
             onClick={onClick}
         >
-            <div className="flex-shrink-0">{icon}</div>
-            <div>
-                <div className="text-sm font-medium">{text}</div>
-                <div className="text-xs text-gray-500">{desc}</div>
+            <div className="flex items-center gap-x-2">
+                <div className="flex-shrink-0">{icon}</div>
+                <div>
+                    <div className="text-sm font-medium">{text}</div>
+                    <div className="text-xs text-gray-500">{desc}</div>
+                </div>
+            </div>
+            <div onClick={e => e.stopPropagation()}>
+                {rightAdornment}
             </div>
         </div>
     );
@@ -50,6 +57,8 @@ const typeToEmoji: TypeToEmoji = {
     protein: "💪",
 };
 
+type ResultStatus = "idle" | "loading" | "fulfilled" | "empty";
+
 export default function MainSearchBar() {
     const dispatch = useAppDispatch();
     const searchQuery = useAppSelector(selectSearchQuery);
@@ -57,22 +66,27 @@ export default function MainSearchBar() {
     const router = useRouter();
 
     const [focused, setFocused] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const [resultsStatus, setResultsStatus] = useState<ResultStatus>("idle");
     const [results, setResults] = useState<AutocompleteResp[]>([]);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
     const renderSearchSuggestions = () => {
-        if (loading) return (
-            <Skeleton count={6} height={26} style={{ marginTop: 10, }} />
+        if (resultsStatus === "loading") return (
+            <Skeleton count={6} height={26} style={{ marginTop: 18, }} />
+        );
+        if (resultsStatus === "empty") return (
+            <div className="flex items-center my-1">
+                <div className="text-gray-500 text-sm">No results found.</div>
+            </div>
         );
 
         const suggestions: React.ReactNode[] = [];
-        // render up to last 6 searches + example searches if focused but no input
         // render slash search filters (e.g. /gene, /variant, /disease)
+        // render up to last 6 searches + example searches if focused but no input
         // render search results
 
-        if (results.length > 0) {
+        if (resultsStatus === "fulfilled") {
             suggestions.push(
                 <SearchSuggestionDivider text="Search Results" key="searchResults" />
             );
@@ -100,7 +114,6 @@ export default function MainSearchBar() {
             return suggestions;
         }
 
-
         if (recentSearches.length > 0) {
             suggestions.push(
                 <SearchSuggestionDivider text="Recent Searches" key="recentSearches" />
@@ -109,7 +122,7 @@ export default function MainSearchBar() {
                 const res = recentSearches[i];
                 if (!res) continue;
                 suggestions.push(
-                    <SearchSuggestionBase 
+                    <SearchSuggestionBase
                         text={res.result.term}
                         desc={res.result.type}
                         icon={<div className="text-gray-500 text-sm">{typeToEmoji[res.result.type] || '🔎'}</div>}
@@ -120,26 +133,51 @@ export default function MainSearchBar() {
                             }));
                             router.push(res.result.uri)
                         }}
+                        rightAdornment={
+                            <div className="text-xs text-gray-500" onClick={() => {
+                                dispatch(deleteAtTimestamp(res.timestamp));
+                            }}>
+                                Delete
+                            </div>
+                        }
                         key={`recentSearch-${i}`}
                     />
                 );
             }
         }
 
+        suggestions.push(
+            <SearchSuggestionDivider text="Filters" key="filters" />
+        );
+
+        AutocompleteService.allTypes.forEach((type) => {
+            suggestions.push(
+                <SearchSuggestionBase
+                    icon={<div className="text-gray-500 text-sm">{typeToEmoji[type] || '🔎'}</div>}
+                    text={`/${type}`}
+                    desc="Search by type"
+                    onClick={() => {
+                        dispatch(setSearchQuery(`/${type}`));
+                    }}
+                    key={`filter-${type}`}
+                />
+            );
+        });
+
         return suggestions;
     }
 
     const updateSearch = async (query: string) => {
         if (!query.length) {
-            setLoading(false);
+            setResultsStatus("idle");
             setResults([]);
             return;
-        };
+        }
         const data = await AutocompleteService.getAutocompleteResults(query);
 
         setResults(data);
 
-        setLoading(false);
+        setResultsStatus(data.length > 0 ? "fulfilled" : "empty");
     };
 
     const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), []);
@@ -147,21 +185,22 @@ export default function MainSearchBar() {
     useEffect(() => {
         debouncedUpdateSearch(searchQuery);
         if (searchQuery.length > 0) {
-            setLoading(true);
+            setResultsStatus("loading");
+            setFocused(true);
         }
     }, [searchQuery]);
 
     useEffect(() => {
         function handleClickOutside(event: any) {
-          if (containerRef.current && !containerRef.current.contains(event.target)) {
-            setFocused(false);
-          }
+            if (containerRef.current && !containerRef.current.contains(event.target)) {
+                setFocused(false);
+            }
         }
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
-          document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
-      }, [containerRef]);
+    }, [containerRef]);
 
     const expanded = focused || searchQuery.length > 0;
 
