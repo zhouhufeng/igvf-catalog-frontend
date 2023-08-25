@@ -1,11 +1,13 @@
 import { PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { AutocompleteResp } from "@/lib/services/AutocompleteService";
+import { AutocompleteResp, QueryType } from "@/lib/services/AutocompleteService";
 
 export interface SearchHistoryEntry {
     result: AutocompleteResp;
     timestamp: number;
 }
+
+export type SlashCommandType = QueryType;
 
 const searchHistoryAdapter = createEntityAdapter<SearchHistoryEntry>({
     selectId: (entry) => entry.timestamp,
@@ -19,6 +21,7 @@ export const searchSlice = createSlice({
     initialState: {
         searchHistory: searchHistoryAdapter.getInitialState(),
         searchQuery: "",
+        slashCommand: null as SlashCommandType | null,
     },
     reducers: {
         addSearchHistoryEntry: (state, action: PayloadAction<SearchHistoryEntry>) => {
@@ -26,7 +29,6 @@ export const searchSlice = createSlice({
             let toRemove: SearchHistoryEntry[] = [];
             if (curHistory.find((e) => e.result.uri === action.payload.result.uri)) {
                 toRemove.push(...curHistory.filter((e) => e.result.uri === action.payload.result.uri));
-                console.log(toRemove);
             }
             if (curHistory.length > maxHistoryLength) {
                 toRemove.push(...curHistory.slice(maxHistoryLength));
@@ -42,11 +44,14 @@ export const searchSlice = createSlice({
         },
         setSearchQuery: (state, action) => {
             state.searchQuery = action.payload;
+        },
+        setSlashCommand: (state, action: PayloadAction<SlashCommandType | null>) => {
+            state.slashCommand = action.payload;
         }
     }
 });
 
-export const { addSearchHistoryEntry, clearSearchHistory, setSearchQuery, deleteAtTimestamp } = searchSlice.actions;
+export const { addSearchHistoryEntry, clearSearchHistory, setSearchQuery, deleteAtTimestamp, setSlashCommand } = searchSlice.actions;
 
 export const searchHistorySelectors = searchHistoryAdapter.getSelectors<RootState>(
     (state) => state.search.searchHistory
@@ -54,5 +59,6 @@ export const searchHistorySelectors = searchHistoryAdapter.getSelectors<RootStat
 
 export const selectSearchHistory = searchHistorySelectors.selectAll;
 export const selectSearchQuery = (state: RootState) => state.search.searchQuery;
+export const selectSlashCommand = (state: RootState) => state.search.slashCommand;
 
 export default searchSlice.reducer;

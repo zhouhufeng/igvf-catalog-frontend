@@ -3,9 +3,8 @@ import './globals.css'
 import 'react-loading-skeleton/dist/skeleton.css'
 import { Inter } from 'next/font/google'
 
-import ReduxProvider from './_redux/provider'
-import Footer from '@/components/Footer'
 import Providers from './providers'
+import BackgroundFrame from './backgroundFrame'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,9 +22,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          {children}
+          <BackgroundFrame>
+            {children}
+          </BackgroundFrame>
         </Providers>
-        <Footer />
       </body>
     </html>
   )

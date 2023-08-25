@@ -1,6 +1,6 @@
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { addSearchHistoryEntry, deleteAtTimestamp, selectSearchHistory, selectSearchQuery, setSearchQuery } from "@/app/_redux/slices/searchSlice";
+import { SlashCommandType, addSearchHistoryEntry, deleteAtTimestamp, selectSearchHistory, selectSearchQuery, selectSlashCommand, setSearchQuery, setSlashCommand } from "@/app/_redux/slices/searchSlice";
 import AutocompleteService, { AutocompleteResp, QueryType } from "@/lib/services/AutocompleteService";
 import { debounce } from "@/lib/utils";
 import classNames from "classnames";
@@ -30,7 +30,7 @@ function SearchSuggestionBase({
 }) {
     return (
         <div
-            className="cursor-pointer hover:bg-gray-100 p-1 rounded-xl flex flex-row justify-between items-center"
+            className="cursor-pointer hover:bg-gray-100 p-1 pr-2 rounded-xl flex flex-row justify-between items-center"
             onClick={onClick}
         >
             <div className="flex items-center gap-x-2">
@@ -59,18 +59,16 @@ const typeToEmoji: TypeToEmoji = {
 
 type ResultStatus = "idle" | "loading" | "fulfilled" | "empty";
 
-type SlashCommandType = QueryType;
-
 export default function MainSearchBar() {
     const dispatch = useAppDispatch();
     const searchQuery = useAppSelector(selectSearchQuery);
     const recentSearches = useAppSelector(selectSearchHistory);
+    const slashCommand = useAppSelector(selectSlashCommand);
     const router = useRouter();
 
     const [focused, setFocused] = useState(false);
     const [resultsStatus, setResultsStatus] = useState<ResultStatus>("idle");
     const [results, setResults] = useState<AutocompleteResp[]>([]);
-    const [slashCommand, setSlashCommand] = useState<SlashCommandType | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const textFieldRef = useRef<HTMLInputElement>(null);
@@ -166,7 +164,7 @@ export default function MainSearchBar() {
                     text={`/${type}`}
                     desc="Search by type"
                     onClick={() => {
-                        setSlashCommand(type);
+                        dispatch(setSlashCommand(type));
                         dispatch(setSearchQuery(""));
                         textFieldRef.current?.focus();
                     }}
@@ -198,7 +196,7 @@ export default function MainSearchBar() {
 
     const handleClear = () => {
         dispatch(setSearchQuery(""));
-        setSlashCommand(null);
+        dispatch(setSlashCommand(null));
         setFocused(false);
     }
 
@@ -208,7 +206,7 @@ export default function MainSearchBar() {
         if (searchQuery.startsWith('/')) {
             updateSearch(searchQuery);
             if (allSlashCommands.includes(searchQuery.slice(1) as any)) {
-                setSlashCommand(searchQuery.slice(1) as SlashCommandType);
+                dispatch(setSlashCommand(searchQuery.slice(1) as SlashCommandType));
                 setResultsStatus("idle");
                 dispatch(setSearchQuery(""));
             }
@@ -265,7 +263,7 @@ export default function MainSearchBar() {
                         onFocus={() => setFocused(true)}
                         onKeyDown={(e) => {
                             if (e.key === "Backspace" && searchQuery.length === 0) {
-                                setSlashCommand(null);
+                                dispatch(setSlashCommand(null));
                             }
                         }}
                         onChange={(e) => {
