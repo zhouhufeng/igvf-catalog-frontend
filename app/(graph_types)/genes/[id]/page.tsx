@@ -17,7 +17,10 @@ export default async function Page({
         <div className="flex-1 flex flex-row">
             <SetNavigation title={geneData._id} />
             <GeneSidebar data={geneData} />
-            <GraphContainer edges={edges} />
+            <GraphContainer
+                edges={edges}
+                root={{ gene: geneData }}
+            />
         </div>
     )
 }

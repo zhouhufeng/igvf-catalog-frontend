@@ -13,7 +13,7 @@ export function GeneSidebar({
     return (
         <div className="flex flex-col border-r border-slate-400 w-1/3 pt-6 pr-6" style={{ height: contentHeight }}>
             <h1 className="text-3xl font-medium pb-6">Gene {data.gene_name}</h1>
-            <div className="bg-white p-4 shadow-md rounded-md">
+            <div className="bg-white p-4 shadow-md rounded-xl">
                 <h2 className="text-xl font-semibold">{data.gene_name}</h2>
                 <p className="text-gray-500">{data.gene_type || 'Unknown Type'}</p>
                 {data.alias && (

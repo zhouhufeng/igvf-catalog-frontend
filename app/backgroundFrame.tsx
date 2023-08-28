@@ -37,7 +37,7 @@ export default function BackgroundFrame({
                                 transition={{ duration: 0.5 }}
                             >
                                 {title ? (
-                                    <h1>
+                                    <h1 className='text-gray-500'>
                                         <span className='px-2'>/</span>
                                         <span>{title}</span>
                                     </h1>
