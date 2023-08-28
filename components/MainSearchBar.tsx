@@ -259,7 +259,7 @@ export default function MainSearchBar() {
                             "outline-none block text-2xl flex-1 rounded-2xl border-0 py-1.5",
                             { "rounded-b-none": expanded }
                         )}
-                        placeholder="1433B_HUMAN, rs78196225..."
+                        placeholder="rs78196225, TP53, 1433B_HUMAN, cancer ..."
                         onFocus={() => setFocused(true)}
                         onKeyDown={(e) => {
                             if (e.key === "Backspace" && searchQuery.length === 0) {
