@@ -1,5 +1,6 @@
 "use client";
 
+import { GeneEnsemblById } from "@/components/extLinks";
 import useLayout from "@/lib/hooks/useLayout";
 import { GeneNodeData } from "@/lib/services/NodeService";
 
@@ -26,7 +27,7 @@ export function GeneSidebar({
                         </ul>
                     </div>
                 )}
-                <p className="text-gray-600 mt-2">ID: {data._id}</p>
+                <p className="text-gray-600 mt-2"><GeneEnsemblById id={data._id} /></p>
                 <p className="text-gray-600">Chromosome: {data.chr}</p>
                 <p className="text-gray-600">Start: {data.start || 'N/A'}</p>
                 <p className="text-gray-600">End: {data.end || 'N/A'}</p>
