@@ -2,6 +2,7 @@ import SetNavigation from "@/components/SetNavigation";
 import GraphService from "@/lib/services/GraphService";
 import NodeService from "@/lib/services/NodeService";
 import { api } from "@/utils/trpc";
+import { ProteinUniprotByName } from "@/components/extLinks";
 
 export default async function Page({
     params: { id },
@@ -15,6 +16,7 @@ export default async function Page({
         <div>
             <SetNavigation title={proteinData._id} />
             <h1 className="text-3xl font-medium">{proteinData.name}</h1>
+            <ProteinUniprotByName name={proteinData.name} />
         </div>
     )
 }

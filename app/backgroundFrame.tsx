@@ -48,7 +48,7 @@ export default function BackgroundFrame({
 
                     <div className="gap-x-12 hidden sm:flex">
                         {navigation.map((item) => (
-                            <a key={item.name} href={item.href} target="_blank" className="text-sm font-semibold leading-6 text-gray-900">
+                            <a key={item.name} href={item.href} target="_blank" className="text-sm font-semibold leading-6">
                                 {item.name}
                             </a>
                         ))}
