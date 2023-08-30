@@ -342,7 +342,7 @@ anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-arangojs@^8.1.0:
+arangojs@^8.1.0, arangojs@^8.4.0:
   version "8.4.0"
   resolved "https://registry.yarnpkg.com/arangojs/-/arangojs-8.4.0.tgz#b1269c4db45d0f1f032a40af02801edadb6f24eb"
   integrity sha512-WHirnoGL0cHZt/qw3gR/SPXc19SJ0UANYZL90wBWIFnxO/itzN/N8Ss9ylXnCBi8Iz34XmUAvMCjF4C90AKW2A==
