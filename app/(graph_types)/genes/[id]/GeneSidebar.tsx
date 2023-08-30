@@ -21,7 +21,9 @@ export function GeneSidebar({
                         <p className="text-gray-700">Aliases:</p>
                         <ul className="list-disc pl-4">
                             {data.alias.map((alias, index) => (
-                                <li key={index}>{alias}</li>
+                                <li key={index}>
+                                    <span className="line-clamp-1">{alias}</span>
+                                </li>
                             ))}
                         </ul>
                     </div>
