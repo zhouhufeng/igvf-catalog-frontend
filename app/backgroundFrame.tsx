@@ -55,7 +55,7 @@ export default function BackgroundFrame({
                     </div>
                 </nav>
             </header>
-            <div className="relative isolate px-6" style={{ paddingTop: headerHeight }}>
+            <div className="relative isolate" style={{ paddingTop: headerHeight }}>
                 <div
                     className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80"
                     aria-hidden="true"

@@ -1,7 +1,8 @@
 import SetNavigation from "@/components/SetNavigation";
 import GraphService from "@/lib/services/GraphService";
 import NodeService from "@/lib/services/NodeService";
-import { api } from "@/utils/trpc";
+import { TranscriptSidebar } from "./TranscriptSidebar";
+import GraphContainer from "../../GraphContainer";
 
 export default async function Page({
     params: { id },
@@ -12,9 +13,17 @@ export default async function Page({
     const edges = await GraphService.getTranscriptEdges(id);
 
     return (
-        <div>
+        <div className="flex-1 flex flex-row">
             <SetNavigation title={transcriptData._id} />
-            <h1 className="text-3xl font-medium">{transcriptData.transcript_name}</h1>
+            <div className="w-1/4">
+                <TranscriptSidebar data={transcriptData} />
+            </div>
+            <div className="w-3/4">
+                <GraphContainer
+                    edges={edges}
+                    root={{ transcript: transcriptData }}
+                />
+            </div>
         </div>
     )
 }

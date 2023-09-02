@@ -1,3 +1,5 @@
+"use server";
+
 import { Database, aql } from "arangojs";
 
 export type RsVariant = {
@@ -9,17 +11,28 @@ export type RsVariant = {
   annotations: object;
 }
 
-export function getDatabase():Database{
-  // console.log('connecting to db')
+export type DrugNode = {
+  _key: string;
+  _id: string;
+  _rev: string;
+  drug_name: string;
+  drug_ontology_terms: string[];
+  source: string;
+  source_url: string;
+}
+
+function getDatabase():Database{
     return new Database({
-        url: process.env.DB_URL,
-        databaseName: process.env.DB_NAME,
+        url: process.env.DB_URL || "",
+        databaseName: process.env.DB_NAME || "",
         auth: { 
-          username: process.env.DB_USERNAME, 
+          username: process.env.DB_USERNAME || "", 
           password: process.env.DB_PASSWORD
         },
   });
 }
+
+const db = getDatabase();
 
 /**
  * find a list of variants by rsid
@@ -27,7 +40,7 @@ export function getDatabase():Database{
  * @param rsid: rsid to be queried 
  * @returns 
  */
-export async function getVariantByRsid(db: Database, rsid: string): Promise<RsVariant[]> {
+export async function getVariantByRsid(rsid: string): Promise<RsVariant[]> {
   const variants = db.collection("variants");
   try {
     const vs = await db.query(aql`
@@ -37,7 +50,7 @@ export async function getVariantByRsid(db: Database, rsid: string): Promise<RsVa
     `);
     let res:RsVariant[] = [];
     for await (const v of vs) {
-      res.push(v);
+      res.push(v as any);
     }
     return res;
   } catch (err: any) {
@@ -52,7 +65,7 @@ export async function getVariantByRsid(db: Database, rsid: string): Promise<RsVa
  * @param rsid 
  * @param num: how many genes to return, default 5
  */
-export async function getGenesLinkedToRsidKey(db: Database, rsidKey: string, num: number=5) {
+export async function getGenesLinkedToRsidKey(rsidKey: string, num: number=5) {
   const genes = db.collection("genes");
   const variants = db.collection("variants");
   try {
@@ -80,7 +93,7 @@ export async function getGenesLinkedToRsidKey(db: Database, rsidKey: string, num
  * @param num 
  * @returns 
  */
-export async function getProteinsLinkedToRsidKey(db: Database, rsidKey: string, num: number=5) {
+export async function getProteinsLinkedToRsidKey(rsidKey: string, num: number=5) {
   const proteins = db.collection("proteins");
   const variants = db.collection("variants");
   try {
@@ -108,7 +121,7 @@ export async function getProteinsLinkedToRsidKey(db: Database, rsidKey: string, 
  * @param num 
  * @returns 
  */
-export async function getDrugsLinkedToRsidKey(db: Database, rsidKey: string, num: number=5) {
+export async function getDrugsLinkedToRsidKey(rsidKey: string, num: number=5) {
   const drugs = db.collection("drugs");
   const variants = db.collection("variants");
   try {

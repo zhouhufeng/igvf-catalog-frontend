@@ -1,8 +1,13 @@
+import { DrugNode, RsVariant } from "@/utils/db";
 import { api, RouterOutputs } from "@/utils/trpc";
 
 export type GeneNodeData = RouterOutputs["geneID"];
 export type ProteinNodeData = RouterOutputs["proteinID"];
 export type TranscriptNodeData = RouterOutputs["transcriptID"];
+export type DrugNodeData = DrugNode;
+export type VariantNodeData = RsVariant;
+
+export type NodeType = "gene" | "protein" | "transcript" | "drug" | "variant";
 
 export default class NodeService {
     static async getGeneData(id: string) {

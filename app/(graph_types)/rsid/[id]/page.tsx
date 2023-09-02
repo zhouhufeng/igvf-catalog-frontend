@@ -1,28 +1,44 @@
 import SetNavigation from "@/components/SetNavigation";
-import { RsVariant, getDatabase, getVariantByRsid, getGenesLinkedToRsidKey, getProteinsLinkedToRsidKey, getDrugsLinkedToRsidKey } from "@/utils/db";
+import { RsVariant, getVariantByRsid, getGenesLinkedToRsidKey, getProteinsLinkedToRsidKey, getDrugsLinkedToRsidKey } from "@/utils/db";
+import { RsidSidebar } from "./RsidSidebar";
+import GraphService from "@/lib/services/GraphService";
+import GraphContainer from "../../GraphContainer";
 
 export default async function RsidPage({
     params: { id },
 }: {
     params: { id: string; };
 }) {
-    console.log(id)
-    const db = getDatabase()
-    const rsData: RsVariant[] = await getVariantByRsid(db, id);
-    // console.log(rsData[0])
-    const linkedProteins = {} //key, each rsidKey from rsData, values: proteins linked to each rsidKey
-    const linkedDrugs = {}
-    for (const r of rsData) {
-        console.log(r._id);
-        linkedProteins[r._id] = await getProteinsLinkedToRsidKey(db, r._id)
-        linkedDrugs[r._id] = await getDrugsLinkedToRsidKey(db, r._id)
-    }
-    console.log(linkedProteins)
-    console.log(linkedDrugs)
+    const rsData: RsVariant[] = await getVariantByRsid(id);
+
+    const rsEdgePromises = rsData.map(rsid => GraphService.getRsidEdges(rsid._id))
+
+    const rsEdges = await Promise.all(rsEdgePromises);
+
     return (
-        <div>
+        <div className="flex-1 flex flex-row">
             <SetNavigation title={id} />
-            <h1 className="text-3xl font-medium">{id}</h1>
+            <div className="w-1/4">
+                <RsidSidebar
+                    variants={rsData}
+                    rsid={id}
+                />
+            </div>
+            <div className="w-3/4">
+                {rsData.map((rsVariant, index) => {
+                    const edges = rsEdges[index];
+
+                    return (
+                        <div>
+                            <GraphContainer
+                                key={rsVariant._id}
+                                edges={edges}
+                                root={{ variant: rsVariant }}
+                            />
+                        </div>
+                    )
+                })}
+            </div>
         </div>
     )
 }

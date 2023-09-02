@@ -16,11 +16,15 @@ export default async function Page({
     return (
         <div className="flex-1 flex flex-row">
             <SetNavigation title={geneData._id} />
-            <GeneSidebar data={geneData} />
-            <GraphContainer
-                edges={edges}
-                root={{ gene: geneData }}
-            />
+            <div className="w-1/4">
+                <GeneSidebar data={geneData} />
+            </div>
+            <div className="w-3/4">
+                <GraphContainer
+                    edges={edges}
+                    root={{ gene: geneData }}
+                />
+            </div>
         </div>
     )
 }

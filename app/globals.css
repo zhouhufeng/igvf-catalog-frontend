@@ -2,11 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
+:root {
     --primary-color: #337788;
 }
 
 a {
     color: var(--primary-color);
     text-decoration: underline dotted;
+}
+
+/* .noScrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.noScrollbar::-webkit-scrollbar {
+    display: none;
+  } */
+
+::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 30px;
 }

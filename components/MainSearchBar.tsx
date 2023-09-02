@@ -57,6 +57,13 @@ const typeToEmoji: TypeToEmoji = {
     protein: "💪",
 };
 
+const exactTypes = {
+    "rs": {
+        path: "/variant",
+        message: "You're entering a variant ID. Enter the full ID then press enter or tap below to search.",
+    }
+}
+
 type ResultStatus = "idle" | "loading" | "fulfilled" | "empty";
 
 export default function MainSearchBar() {
@@ -104,11 +111,11 @@ export default function MainSearchBar() {
                         text={result.term}
                         desc={result.type}
                         onClick={() => {
+                            router.push(result.uri);
                             dispatch(addSearchHistoryEntry({
                                 result,
                                 timestamp: Date.now(),
                             }));
-                            router.push(result.uri)
                         }}
                         key={`searchResult-${i}`}
                     />
@@ -131,11 +138,11 @@ export default function MainSearchBar() {
                         desc={res.result.type}
                         icon={<div className="text-gray-500 text-sm">{typeToEmoji[res.result.type] || '🔎'}</div>}
                         onClick={() => {
+                            router.push(res.result.uri);
                             dispatch(addSearchHistoryEntry({
                                 result: res.result,
                                 timestamp: Date.now(),
                             }));
-                            router.push(res.result.uri)
                         }}
                         rightAdornment={
                             <div className="text-xs text-gray-500" onClick={() => {

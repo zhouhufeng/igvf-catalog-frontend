@@ -1,8 +1,8 @@
 import SetNavigation from "@/components/SetNavigation";
 import GraphService from "@/lib/services/GraphService";
 import NodeService from "@/lib/services/NodeService";
-import { api } from "@/utils/trpc";
-import { ProteinUniprotByName } from "@/components/extLinks";
+import { ProteinSidebar } from "./ProteinSidebar";
+import GraphContainer from "../../GraphContainer";
 
 export default async function Page({
     params: { id },
@@ -13,10 +13,17 @@ export default async function Page({
     const edges = await GraphService.getProteinEdges(id);
 
     return (
-        <div>
+        <div className="flex-1 flex flex-row">
             <SetNavigation title={proteinData._id} />
-            <h1 className="text-3xl font-medium">{proteinData.name}</h1>
-            <ProteinUniprotByName name={proteinData.name} />
+            <div className="w-1/4">
+                <ProteinSidebar data={proteinData} />
+            </div>
+            <div className="w-3/4">
+                <GraphContainer
+                    edges={edges}
+                    root={{ protein: proteinData }}
+                />
+            </div>
         </div>
     )
 }
