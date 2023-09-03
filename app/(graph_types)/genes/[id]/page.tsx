@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import SetNavigation from "@/components/SetNavigation";
 import GraphService from "@/lib/services/GraphService";
 import NodeService from "@/lib/services/NodeService";
-import { api } from "@/utils/trpc";
 import { GeneSidebar } from "./GeneSidebar";
 import GraphContainer from "../../GraphContainer";
 
