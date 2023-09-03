@@ -1,5 +1,7 @@
+import { notFound } from 'next/navigation';
+
 import SetNavigation from "@/components/SetNavigation";
-import { RsVariant, getVariantByRsid, getGenesLinkedToRsidKey, getProteinsLinkedToRsidKey, getDrugsLinkedToRsidKey } from "@/utils/db";
+import { RsVariant, getVariantByRsid } from "@/utils/db";
 import { RsidSidebar } from "./RsidSidebar";
 import GraphService from "@/lib/services/GraphService";
 import GraphContainer from "../../GraphContainer";
@@ -10,6 +12,10 @@ export default async function RsidPage({
     params: { id: string; };
 }) {
     const rsData: RsVariant[] = await getVariantByRsid(id);
+
+    if (!rsData.length) {
+        notFound();
+    }
 
     const rsEdgePromises = rsData.map(rsid => GraphService.getRsidEdges(rsid._id))
 

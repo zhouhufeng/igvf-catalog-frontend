@@ -1,3 +1,5 @@
+import { notFound } from 'next/navigation';
+
 import SetNavigation from "@/components/SetNavigation";
 import GraphService from "@/lib/services/GraphService";
 import NodeService from "@/lib/services/NodeService";
@@ -11,6 +13,10 @@ export default async function Page({
 }) {
     const proteinData = await NodeService.getProteinData(id);
     const edges = await GraphService.getProteinEdges(id);
+
+    if (!proteinData || !edges) {
+        notFound();
+    }
 
     return (
         <div className="flex-1 flex flex-row">

@@ -11,14 +11,26 @@ export type NodeType = "gene" | "protein" | "transcript" | "drug" | "variant";
 
 export default class NodeService {
     static async getGeneData(id: string) {
-        return await api.geneID.query({ id });
+        try {
+            return await api.geneID.query({ id });
+        } catch (error) {
+            return null;
+        }
     }
 
     static async getProteinData(id: string) {
-        return await api.proteinID.query({ id });
+        try {
+            return await api.proteinID.query({ id });
+        } catch (error) {
+            return null;
+        }
     }
 
     static async getTranscriptData(id: string) {
-        return await api.transcriptID.query({ id });
+        try {
+            return await api.transcriptID.query({ id });
+        } catch (error) {
+            return null;
+        }
     }
 }
