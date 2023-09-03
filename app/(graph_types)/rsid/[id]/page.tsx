@@ -19,7 +19,11 @@ export default async function RsidPage({
 
     const rsEdgePromises = rsData.map(rsid => GraphService.getRsidEdges(rsid._id))
 
-    const rsEdges = await Promise.all(rsEdgePromises);
+    const rsEdges = (await Promise.all(rsEdgePromises));
+
+    if (!rsEdges) {
+        notFound();
+    }
 
     return (
         <div className="flex-1 flex flex-row">
@@ -32,7 +36,7 @@ export default async function RsidPage({
             </div>
             <div className="w-3/4">
                 {rsData.map((rsVariant, index) => {
-                    const edges = rsEdges[index];
+                    const edges = rsEdges[index] || [];
 
                     return (
                         <div>
