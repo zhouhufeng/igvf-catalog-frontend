@@ -19,7 +19,7 @@ export default async function RsidPage({
 
     const rsEdgePromises = rsData.map(rsid => GraphService.getRsidEdges(rsid._id))
 
-    const rsEdges = (await Promise.all(rsEdgePromises));
+    const rsEdges = await Promise.all(rsEdgePromises);
 
     if (!rsEdges) {
         notFound();

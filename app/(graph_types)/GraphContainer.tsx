@@ -4,9 +4,8 @@ import { GeneEnsemblById } from "@/components/extLinks";
 import { GraphNode } from "@/lib/services/GraphService";
 import { NodeType } from "@/lib/services/NodeService";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArcherContainer, ArcherElement } from 'react-archer';
-import { RelationType } from "react-archer/lib/types";
 
 function GeneNodeContent({
   gene
