@@ -1,9 +1,16 @@
 import { PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
-import { AutocompleteResp, QueryType } from "@/lib/services/AutocompleteService";
+import { QueryType } from "@/lib/services/AutocompleteService";
+import { exactTypes } from "@/components/MainSearchBar";
+
+interface SearchHistoryEntryType {
+    term: string,
+    uri: string,
+    type: QueryType | keyof typeof exactTypes;
+}
 
 export interface SearchHistoryEntry {
-    result: AutocompleteResp;
+    result: SearchHistoryEntryType;
     timestamp: number;
 }
 

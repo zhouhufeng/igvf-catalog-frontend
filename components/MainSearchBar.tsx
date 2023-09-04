@@ -48,20 +48,30 @@ function SearchSuggestionBase({
 }
 
 type TypeToEmoji = {
-    [key in QueryType]: string;
+    [key in (QueryType | keyof typeof exactTypes)]: string;
 };
 
 const typeToEmoji: TypeToEmoji = {
     gene: "🧬",
     "ontology term": "📚",
     protein: "💪",
+    rs: "🦠",
 };
 
-const exactTypes = {
+export const exactTypes = {
     "rs": {
-        path: "/variant",
-        message: "You're entering a variant ID. Enter the full ID then press enter or tap below to search.",
+        path: "/rsid",
+        message: "You're entering a variant ID. Enter the full ID then click here to search.",
     }
+}
+
+const getTypeFromQuery = (query: string): keyof typeof exactTypes | null => {
+    for (let prefix of Object.keys(exactTypes)) {
+        if (query.startsWith(prefix)) {
+            return prefix as keyof typeof exactTypes;
+        }
+    }
+    return null;
 }
 
 type ResultStatus = "idle" | "loading" | "fulfilled" | "empty";
@@ -76,6 +86,7 @@ export default function MainSearchBar() {
     const [focused, setFocused] = useState(false);
     const [resultsStatus, setResultsStatus] = useState<ResultStatus>("idle");
     const [results, setResults] = useState<AutocompleteResp[]>([]);
+    const [exactType, setExactType] = useState<keyof typeof exactTypes | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const textFieldRef = useRef<HTMLInputElement>(null);
@@ -83,6 +94,27 @@ export default function MainSearchBar() {
     const allSlashCommands: SlashCommandType[] = AutocompleteService.allTypes;
 
     const renderSearchSuggestions = () => {
+        if (exactType !== null) {
+            return (
+                <SearchSuggestionBase
+                    icon={<div className="text-gray-500 text-sm">{typeToEmoji[exactType] || '🔎'}</div>}
+                    text={`"${searchQuery}"`}
+                    desc={exactTypes[exactType].message}
+                    onClick={() => {
+                        router.push(`${exactTypes[exactType].path}/${searchQuery}`);
+                        dispatch(addSearchHistoryEntry({
+                            result: {
+                                term: searchQuery,
+                                uri: `${exactTypes[exactType].path}/${searchQuery}`,
+                                type: exactType,
+                            },
+                            timestamp: Date.now(),
+                        }));
+                    }}
+                    key={`searchResult-${exactType}`}
+                />
+            )   
+        }
         if (resultsStatus === "loading") return (
             <Skeleton count={6} height={26} style={{ marginTop: 18, }} />
         );
@@ -184,7 +216,7 @@ export default function MainSearchBar() {
     }
 
     const updateSearch = async (query: string) => {
-        if (!query.length || query.startsWith('/')) {
+        if (!query.length || query.startsWith('/') || exactType !== null) {
             setResultsStatus("idle");
             setResults([]);
             return;
@@ -207,10 +239,11 @@ export default function MainSearchBar() {
         setFocused(false);
     }
 
-    const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), [slashCommand]);
+    const debouncedUpdateSearch = useCallback(debounce(updateSearch, 500), [slashCommand, exactType]);
 
     useEffect(() => {
-        if (searchQuery.startsWith('/')) {
+        const queryType = getTypeFromQuery(searchQuery);
+        if (searchQuery.startsWith('/') || queryType !== null) {
             updateSearch(searchQuery);
             if (allSlashCommands.includes(searchQuery.slice(1) as any)) {
                 dispatch(setSlashCommand(searchQuery.slice(1) as SlashCommandType));
@@ -223,6 +256,9 @@ export default function MainSearchBar() {
                 setResultsStatus("loading");
                 setFocused(true);
             }
+        }
+        if (queryType !== exactType) {
+            setExactType(queryType);
         }
     }, [searchQuery]);
 

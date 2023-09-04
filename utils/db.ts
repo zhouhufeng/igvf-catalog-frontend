@@ -1,5 +1,3 @@
-"use server";
-
 import { Database, aql } from "arangojs";
 
 export type RsVariant = {
