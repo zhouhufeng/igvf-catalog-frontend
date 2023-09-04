@@ -1,6 +1,6 @@
 import { RouterInputs, RouterOutputs, api } from "@/utils/trpc";
 import { DrugNodeData, GeneNodeData, ProteinNodeData, TranscriptNodeData, VariantNodeData } from "./NodeService";
-import { getDrugsLinkedToRsidKey, getProteinsLinkedToRsidKey } from "@/utils/db";
+import { getDrugsLinkedToRsidKey, getGenesLinkedToRsidKey, getProteinsLinkedToRsidKey } from "@/utils/db";
 
 export interface GraphNode {
     gene?: GeneNodeData;
@@ -46,10 +46,11 @@ export default class GraphService {
 
     static async getRsidEdges(rsidNodeId: string): Promise<GraphNode[] | null> {
         try {
+            const geneEdges = (await getGenesLinkedToRsidKey( rsidNodeId )).map(gene => ({ gene }));
             const proteinEdges = (await getProteinsLinkedToRsidKey(rsidNodeId)).map(protein => ({ protein }));
             const drugEdges = (await getDrugsLinkedToRsidKey(rsidNodeId)).map(drug => ({ drug }));
-
-            return [...proteinEdges, ...drugEdges];
+            console.log(geneEdges, proteinEdges, drugEdges)
+            return [...geneEdges, ...proteinEdges, ...drugEdges];
         } catch (error) {
             return null;
         }

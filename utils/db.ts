@@ -50,7 +50,9 @@ export async function getVariantByRsid(rsid: string): Promise<RsVariant[]> {
     `);
     let res:RsVariant[] = [];
     for await (const v of vs) {
-      res.push(v as any);
+      const newId = v["_key"];
+      const newKey = v["_id"];
+      res.push({...v, _id: newId, _key: newKey});
     }
     return res;
   } catch (err: any) {
@@ -77,7 +79,9 @@ export async function getGenesLinkedToRsidKey(rsidKey: string, num: number=5) {
     `);
     let res = [];
     for await (const g of gs) {
-      res.push(g);
+      const newId = g["_key"];
+      const newKey = g["_id"];
+      res.push({...g, _id: newId, _key: newKey});
     }
     return res;
   } catch (err: any) {
@@ -105,7 +109,9 @@ export async function getProteinsLinkedToRsidKey(rsidKey: string, num: number=5)
     `);
     let res = [];
     for await (const g of gs) {
-      res.push(g);
+      const newId = g["_key"];
+      const newKey = g["_id"];
+      res.push({...g, _id: newId, _key: newKey});
     }
     return res;
   } catch (err: any) {
@@ -133,7 +139,9 @@ export async function getDrugsLinkedToRsidKey(rsidKey: string, num: number=5) {
     `);
     let res = [];
     for await (const g of gs) {
-      res.push(g);
+      const newId = g["_key"];
+      const newKey = g["_id"];
+      res.push({...g, _id: newId, _key: newKey});
     }
     return res;
   } catch (err: any) {
