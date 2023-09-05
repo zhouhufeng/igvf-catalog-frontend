@@ -1,6 +1,6 @@
 "use client";
 
-import { GeneEnsemblById } from "@/components/extLinks";
+import { GeneEnsemblById, ProteinUniprotById } from "@/components/extLinks";
 import { GraphNode } from "@/lib/services/GraphService";
 import { NodeType } from "@/lib/services/NodeService";
 import Link from "next/link";
@@ -63,7 +63,7 @@ function ProteinNodeContent({
         <h1 className="text-2xl font-bold mb-2 break-words">{protein.name}</h1>
       </Link>
       <div className="text-gray-700 mb-2 truncate">
-        <GeneEnsemblById id={protein._id} />
+        <ProteinUniprotById id={protein._id} />
       </div>
       <div className="text-gray-700 mb-2 truncate">
         <span className="font-bold">Source:</span> {protein.source}

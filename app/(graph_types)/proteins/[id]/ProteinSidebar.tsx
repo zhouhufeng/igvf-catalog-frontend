@@ -1,6 +1,6 @@
 "use client";
 
-import { GeneEnsemblById, GeneGenecardsByName, ProteinUniprotByName } from "@/components/extLinks";
+import { GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName } from "@/components/extLinks";
 import useLayout from "@/lib/hooks/useLayout";
 import { ProteinNodeData } from "@/lib/services/NodeService";
 
@@ -28,8 +28,8 @@ export function ProteinSidebar({
                         </ul>
                     </div>
                 )}
-                <p className="text-gray-600 mt-2"><GeneEnsemblById id={data._id} /></p>
-                <a href={data.source_url}><p className="text-gray-600">Chromosome: {data.source}</p></a>
+                <p className="text-gray-600 mt-2"><ProteinUniprotById id={data._id} /></p>
+                <p className="text-gray-600">Data source: <a href={data.source_url}>{data.source}</a></p>
             </div>
         </div>
     );
