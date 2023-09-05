@@ -1,3 +1,4 @@
+"use client";
 /**
  * this file contains links to external databases based on id or names
  * naming: typeDataBaseByNameorId
