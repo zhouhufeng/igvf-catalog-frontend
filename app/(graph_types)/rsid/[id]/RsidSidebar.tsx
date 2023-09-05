@@ -3,7 +3,7 @@
 import useLayout from "@/lib/hooks/useLayout";
 import { RsVariant } from "@/utils/db";
 
-export function RsidSidebar({
+export default function RsidSidebar({
     variants,
     rsid
 }: {
