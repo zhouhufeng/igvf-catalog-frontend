@@ -1,6 +1,6 @@
 "use client";
 
-import { GeneEnsemblById, ProteinUniprotById } from "@/components/extLinks";
+import { GeneEnsemblById, ProteinUniprotById, PubMedLink } from "@/components/extLinks";
 import { GraphNode } from "@/lib/services/GraphService";
 import { NodeType } from "@/lib/services/NodeService";
 import Link from "next/link";
@@ -145,6 +145,34 @@ function DrugNodeContent({
   )
 }
 
+function StudyNodeContent({
+  study
+}: {
+  study: GraphNode['study']
+}) {
+  if (!study) return null;
+
+  return (
+    <>
+      <Link href={`/studys/${study._id}`}>
+        <h1 className="text-2xl font-bold mb-2">{study.trait_reported}</h1>
+      </Link>
+      <div className="text-gray-700 mb-2 truncate">
+        <span className="font-bold">Title:</span> {study.pub_title}
+      </div>
+      <div className="text-gray-700 mb-2 truncate">
+        <span className="font-bold">Journal:</span> {study.pub_journal}
+      </div>
+      <div className="text-gray-700 mb-2 truncate">
+        <span className="font-bold">Source:</span> {study.source}
+      </div>
+      <div className="text-gray-700 mb-2 truncate">
+        <PubMedLink pmid={study.pmid} />
+      </div>
+    </>
+  )
+}
+
 function VariantNodeContent({
   variant
 }: {
@@ -182,6 +210,7 @@ function DisplayGraphNode({
         if (node.protein) return <ProteinNodeContent protein={node.protein} />
         if (node.transcript) return <TranscriptNodeContent transcript={node.transcript} />
         if (node.drug) return <DrugNodeContent drug={node.drug} />
+        if (node.study) return <StudyNodeContent study={node.study} />
         if (node.variant) return <VariantNodeContent variant={node.variant} />
 
         return null;
@@ -201,6 +230,7 @@ export default function GraphContainer({
   const proteins = edges.filter((edge) => edge.protein);
   const transcripts = edges.filter((edge) => edge.transcript);
   const drugs = edges.filter((edge) => edge.drug);
+  const studies = edges.filter((edge) => edge.study);
 
   const [openType, setOpenType] = useState<NodeType | null>(null);
 
@@ -268,6 +298,20 @@ export default function GraphContainer({
               )
             }
 
+            if (openType === "study") {
+              return (
+                <div className="mb-6">
+                  <div className="flex flex-row items-center gap-x-4">
+                    <BackButton onClick={handleCloseType} />
+                    <h2 className="text-2xl">Studies</h2>
+                  </div>
+                  <div className="grid grid-cols-3">
+                    {studies.map(n => <DisplayGraphNode key={n.study?._id} node={n} />)}
+                  </div>
+                </div>
+              )
+            }
+
             return null;
           })()}
         </div>
@@ -307,6 +351,12 @@ export default function GraphContainer({
                   targetAnchor: 'left',
                   sourceAnchor: 'right',
                   style: { strokeColor: 'black' }
+                },
+                {
+                  targetId: 'studyContainer',
+                  targetAnchor: 'left',
+                  sourceAnchor: 'right',
+                  style: { strokeColor: 'red' }
                 },
               ]}
             >
@@ -378,6 +428,22 @@ export default function GraphContainer({
                     </div>
                     <div className="flex flex-row">
                       {drugs.map(n => <DisplayGraphNode key={n.drug?._id} node={n} />)}
+                    </div>
+                  </div>
+                </ArcherElement>
+              ) : null}
+
+              {studies.length > 0 ? (
+                <ArcherElement
+                  id="studyContainer"
+                >
+                  <div className="mb-6">
+                    <div className="flex flex-row items-center gap-x-4">
+                      <h2 className="text-2xl">Studies</h2>
+                      <ExpandIcon onClick={() => setOpenType('drug')} />
+                    </div>
+                    <div className="flex flex-row">
+                      {studies.map(n => <DisplayGraphNode key={n.study?._id} node={n} />)}
                     </div>
                   </div>
                 </ArcherElement>
