@@ -18,3 +18,12 @@ export function GeneEnsemblById({ id }: { id: string }): JSX.Element {
 export function GeneGenecardsByName({ name }: { name: string }): JSX.Element {
     return <a href={`https://www.genecards.org/cgi-bin/carddisp.pl?gene=${name}`} target='_blank'>Genecards</a>;
 }
+
+export function PubMedLink({ pmid }: { pmid: string }): JSX.Element {
+    //PMID:34910505
+    let id = pmid;
+    if (pmid.startsWith('PMID:')) {
+        id = pmid.split(':')[1]
+    }
+    return <span>PubMed: <a href={`https://pubmed.ncbi.nlm.nih.gov/${id}`} target='_blank'>{id}</a></span>;
+}

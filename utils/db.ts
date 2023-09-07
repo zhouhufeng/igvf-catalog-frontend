@@ -7,6 +7,20 @@ export type RsVariant = {
   'pos:long': number;
   rsid: string[];
   annotations: object;
+  ref: string;
+  alt: string;
+  
+}
+
+export type StudyNode = {
+  _key: string;
+  _id: string;
+  pub_title: string;
+  pub_date: string;
+  pmid: string;
+  pub_journal: string;
+  source: string;
+  trait_reported: string;
 }
 
 export type DrugNode = {
@@ -132,6 +146,29 @@ export async function getDrugsLinkedToRsidKey(rsidKey: string, num: number=5) {
     const gs = await db.query<any>(aql`
     WITH ${variants}, ${drugs}
       FOR v IN OUTBOUND ${rsidKey} variants_drugs
+      LIMIT ${num}
+      RETURN v
+    `);
+    let res = [];
+    for await (const g of gs) {
+      const newId = g["_key"];
+      const newKey = g["_id"];
+      res.push({...g, _id: newId, _key: newKey});
+    }
+    return res;
+  } catch (err: any) {
+    console.error(err.message);
+  }
+  return []
+}
+
+export async function getStudiesLinkedToRsidKey(rsidKey: string, num: number=5) {
+  const studies = db.collection("studies");
+  const variants = db.collection("variants");
+  try {
+    const gs = await db.query(aql`
+    WITH ${variants}, ${studies}
+      FOR v IN INBOUND ${rsidKey} studies_variants
       LIMIT ${num}
       RETURN v
     `);
