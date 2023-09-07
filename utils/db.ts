@@ -7,6 +7,9 @@ export type RsVariant = {
   'pos:long': number;
   rsid: string[];
   annotations: object;
+  ref: string;
+  alt: string;
+  
 }
 
 export type StudyNode = {
