@@ -4,7 +4,7 @@ import { GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUnipro
 import useLayout from "@/lib/hooks/useLayout";
 import { ProteinNodeData } from "@/lib/services/NodeService";
 
-export function ProteinSidebar({
+export default function ProteinSidebar({
     data
 }: {
     data: ProteinNodeData;

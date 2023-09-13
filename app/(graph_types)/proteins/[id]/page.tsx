@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import SetNavigation from "@/components/SetNavigation";
 import GraphService from "@/lib/services/GraphService";
 import NodeService from "@/lib/services/NodeService";
-import { ProteinSidebar } from "./ProteinSidebar";
+import ProteinSidebar from "./ProteinSidebar";
 import GraphContainer from "../../GraphContainer";
 
 export default async function Page({

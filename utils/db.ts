@@ -55,7 +55,7 @@ const db = getDatabase();
 export async function getVariantByRsid(rsid: string): Promise<RsVariant[]> {
   const variants = db.collection("variants");
   try {
-    const vs = await db.query(aql`
+    const vs = await db.query<any>(aql`
     FOR v IN ${variants}
     FILTER ${rsid} in v.rsid
     RETURN v
@@ -83,7 +83,7 @@ export async function getGenesLinkedToRsidKey(rsidKey: string, num: number=5) {
   const genes = db.collection("genes");
   const variants = db.collection("variants");
   try {
-    const gs = await db.query(aql`
+    const gs = await db.query<any>(aql`
     WITH ${variants}, ${genes}
       FOR v IN OUTBOUND ${rsidKey} variants_genes
       LIMIT ${num}
@@ -113,7 +113,7 @@ export async function getProteinsLinkedToRsidKey(rsidKey: string, num: number=5)
   const proteins = db.collection("proteins");
   const variants = db.collection("variants");
   try {
-    const gs = await db.query(aql`
+    const gs = await db.query<any>(aql`
     WITH ${variants}, ${proteins}
       FOR v IN OUTBOUND ${rsidKey} variants_proteins
       LIMIT ${num}
@@ -143,7 +143,7 @@ export async function getDrugsLinkedToRsidKey(rsidKey: string, num: number=5) {
   const drugs = db.collection("drugs");
   const variants = db.collection("variants");
   try {
-    const gs = await db.query(aql`
+    const gs = await db.query<any>(aql`
     WITH ${variants}, ${drugs}
       FOR v IN OUTBOUND ${rsidKey} variants_drugs
       LIMIT ${num}
