@@ -174,9 +174,11 @@ export async function getStudiesLinkedToRsidKey(rsidKey: string, num: number=5) 
     `);
     let res = [];
     for await (const g of gs) {
-      const newId = g["_key"];
-      const newKey = g["_id"];
-      res.push({...g, _id: newId, _key: newKey});
+      if(g){
+        const newId = g["_key"];
+        const newKey = g["_id"];
+        res.push({...(g as any), _id: newId, _key: newKey});
+      }
     }
     return res;
   } catch (err: any) {
