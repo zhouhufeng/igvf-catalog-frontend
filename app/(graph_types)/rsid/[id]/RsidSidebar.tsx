@@ -4,7 +4,7 @@ import useLayout from "@/lib/hooks/useLayout";
 import { RsVariant } from "@/utils/db";
 import { VariantAnnotation } from "./VariantAnnotation";
 
-export function RsidSidebar({
+export default function RsidSidebar({
     variants,
     rsid
 }: {

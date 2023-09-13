@@ -4,7 +4,7 @@ import { GeneEnsemblById, GeneGenecardsByName } from "@/components/extLinks";
 import useLayout from "@/lib/hooks/useLayout";
 import { GeneNodeData } from "@/lib/services/NodeService";
 
-export function GeneSidebar({
+export default function GeneSidebar({
     data
 }: {
     data: GeneNodeData;

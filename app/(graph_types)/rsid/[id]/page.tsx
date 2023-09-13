@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import SetNavigation from "@/components/SetNavigation";
 import { RsVariant, getVariantByRsid } from "@/utils/db";
-import { RsidSidebar } from "./RsidSidebar";
+import RsidSidebar from "./RsidSidebar";
 import GraphService from "@/lib/services/GraphService";
 import GraphContainer from "../../GraphContainer";
 
