@@ -3,7 +3,6 @@
 import { GeneEnsemblById, ProteinUniprotById, PubMedLink } from "@/components/extLinks";
 import { GraphNode } from "@/lib/services/GraphService";
 import { NodeType } from "@/lib/services/NodeService";
-import { getDrugsLinkedToRsidKey } from "@/utils/db";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -275,20 +274,6 @@ export default function GraphContainer({
       window.removeEventListener('hashchange', handleHashChange);
     };
   }, []); 
-
-  const [
-    geneStrokeWidth,
-    proteinStrokeWidth,
-    transcriptStrokeWidth,
-    drugStrokeWidth,
-    studyStrokeWidth,
-  ] = calculateStrokeWidths([
-    genes.length,
-    proteins.length,
-    transcripts.length,
-    drugs.length,
-    studies.length,
-  ]);
 
   if (openType) {
     return (
