@@ -1,4 +1,4 @@
-import { RouterInputs, RouterOutputs, api } from "@/utils/api";
+import { RouterInputs, RouterOutputs, api } from "@/lib/utils/api";
 
 export type QueryType = RouterInputs['autocomplete']['type'];
 

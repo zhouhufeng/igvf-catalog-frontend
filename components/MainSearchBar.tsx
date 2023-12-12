@@ -2,7 +2,7 @@ import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { SlashCommandType, addSearchHistoryEntry, deleteAtTimestamp, selectSearchHistory, selectSearchQuery, selectSlashCommand, setSearchQuery, setSlashCommand } from "@/app/_redux/slices/searchSlice";
 import AutocompleteService, { AutocompleteResp, QueryType } from "@/lib/services/AutocompleteService";
-import { debounce } from "@/lib/utils";
+import { debounce } from "@/lib/utils/utils";
 import classNames from "classnames";
 import { useRouter } from "next13-progressbar";
 import Skeleton from 'react-loading-skeleton';
@@ -56,6 +56,7 @@ const typeToEmoji: TypeToEmoji = {
     "ontology term": "📚",
     protein: "💪",
     rs: "🦠",
+    disease: "🩺",
 };
 
 export const exactTypes = {
@@ -143,7 +144,7 @@ export default function MainSearchBar() {
                         text={result.term}
                         desc={result.type}
                         onClick={() => {
-                            router.push(result.uri);
+                            router.push(result.uri.split('/')[1]);
                             dispatch(addSearchHistoryEntry({
                                 result,
                                 timestamp: Date.now(),
@@ -170,7 +171,7 @@ export default function MainSearchBar() {
                         desc={res.result.type}
                         icon={<div className="text-gray-500 text-sm">{typeToEmoji[res.result.type] || '🔎'}</div>}
                         onClick={() => {
-                            router.push(res.result.uri);
+                            router.push(res.result.uri.split('/')[2]);
                             dispatch(addSearchHistoryEntry({
                                 result: res.result,
                                 timestamp: Date.now(),

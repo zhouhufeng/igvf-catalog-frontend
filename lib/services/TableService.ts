@@ -1,4 +1,4 @@
-import { apiBaseUrl } from "@/utils/api";
+import { apiBaseUrl } from "@/lib/utils/api";
 import {
     NodeType
 } from "./NodeService";

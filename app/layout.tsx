@@ -4,7 +4,7 @@ import 'react-loading-skeleton/dist/skeleton.css'
 import { Inter } from 'next/font/google'
 
 import Providers from './providers'
-import BackgroundFrame from './backgroundFrame'
+import Header from '../components/Header'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,9 +25,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <BackgroundFrame>
-            {children}
-          </BackgroundFrame>
+          <div className='flex flex-col h-screen justify-between'>
+            <Header />
+            <div className='mb-auto'>
+              {children}
+            </div>
+          </div>
           {modal}
         </Providers>
       </body>
