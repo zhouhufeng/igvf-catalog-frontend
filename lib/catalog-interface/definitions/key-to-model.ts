@@ -1,30 +1,31 @@
-import GraphNode from "../model/_BaseNode"
+import { GraphNode } from "@/lib/types/derived-types";
+import BaseNode from "../model/_BaseNode"
 
 import GeneNode from "../model/GeneNode"
 import ProteinNode from "../model/ProteinNode";
 import TranscriptNode from "../model/TranscriptNode";
 import VariantNode from "../model/VariantNode";
 
-const prefixes: {
-    prefix: string;
-    model: typeof GraphNode; 
+const keys: {
+    key: keyof GraphNode;
+    model: typeof BaseNode;
 }[] = [
     {
-        prefix: "ENSG",
+        key: "gene",
         model: GeneNode
     },
     {
-        prefix: "ENST",
+        key: "transcript",
         model: TranscriptNode
     },
     {
-        prefix: "P",
+        key: "protein",
         model: ProteinNode
     },
     {
-        prefix: "rs",
+        key: "variant",
         model: VariantNode
     },
 ];
 
-export default prefixes;
+export default keys;

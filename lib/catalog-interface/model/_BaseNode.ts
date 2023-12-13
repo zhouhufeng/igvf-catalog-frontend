@@ -1,22 +1,31 @@
-import { GraphNode } from "@/lib/services/GraphService";
-
+import { GraphNode } from "@/lib/types/derived-types";
+import { ParsedProperties } from "@/lib/types/graph-model-types";
 
 export default class BaseNode {
-    constructor(id: string) {
+    data: any;
+    parsed: ParsedProperties;
+    constructor(data: any) {
         if (this.constructor === BaseNode) {
             throw new Error("Cannot instantiate BaseNode");
         }
+        this.parsed = {
+            id: ""
+        }
     }
 
-    toGraphNode(data: any): any {
+    serialize(): GraphNode {
         throw new Error("Not implemented");
     }
 
-    async get(): Promise<GraphNode | null> {
+    getDisplayName(): string {
         throw new Error("Not implemented");
     }
 
-    async getAdjacent(): Promise<GraphNode[] | null> {
+    static async get(id: string): Promise<BaseNode | null> {
+        throw new Error("Not implemented");
+    }
+
+    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
         throw new Error("Not implemented");
     }
 }

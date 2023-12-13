@@ -1,16 +1,7 @@
 import { api } from "@/lib/utils/api";
-import { DiseaseNodeData, DrugNodeData, GeneNodeData, ProteinNodeData, StudyNodeData, TranscriptNodeData, VariantNodeData } from "./NodeService";
 import { getDrugsLinkedToRsidKey, getGenesLinkedToRsidKey, getProteinsLinkedToRsidKey, getStudiesLinkedToRsidKey } from "@/lib/utils/db";
 
-export interface GraphNode {
-    gene?: GeneNodeData;
-    protein?: ProteinNodeData;
-    transcript?: TranscriptNodeData;
-    drug?: DrugNodeData;
-    variant?: VariantNodeData;
-    study?: StudyNodeData;
-    disease?: DiseaseNodeData;
-}
+import { GeneNodeData, GraphNode, ProteinNodeData, TranscriptNodeData } from "../types/derived-types";
 
 export default class GraphService {
     static async getGeneEdges(gene_id: string): Promise<GraphNode[] | null> {

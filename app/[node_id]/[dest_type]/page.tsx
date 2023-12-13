@@ -1,6 +1,6 @@
 import Modal from "@/components/Modal";
 import NodeEdgesTable from "@/components/node-edges-table/node-edges-table";
-import { NodeType } from "@/lib/services/NodeService";
+import { NodeType } from "@/lib/types/derived-types";
 
 
 export default function Page({

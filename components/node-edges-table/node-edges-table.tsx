@@ -1,6 +1,6 @@
 'use client';
 
-import { NodeType } from "@/lib/services/NodeService";
+import { NodeType } from "@/lib/types/derived-types";
 import TableService from "@/lib/services/TableService";
 import {
     createColumnHelper,
@@ -21,11 +21,9 @@ const columnHelper = createColumnHelper<any>();
 type LoadingState = 'loading' | 'loaded' | 'error';
 
 export default function NodeEdgesTable({
-    baseType,
     baseId,
     tableType
 }: {
-    baseType: NodeType,
     baseId: string,
     tableType: NodeType
 }) {
@@ -67,7 +65,7 @@ export default function NodeEdgesTable({
 
     const fetchData = async () => {
         try {
-            const newRows = await TableService.getTableData(baseType, baseId, tableType);
+            const newRows = await TableService.getTableData(baseId, tableType);
             setData([...data, ...newRows]);
             setLoadingState('loaded');
         } catch (error) {

@@ -1,4 +1,4 @@
-import { PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
 const uiSlice = createSlice({

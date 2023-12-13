@@ -1,16 +1,16 @@
 "use client";
 
-import { GeneNodeData, ProteinNodeData, TranscriptNodeData } from "@/lib/services/NodeService";
+import { GeneNodeData, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
 import { GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName, PubMedLink } from "./extLinks";
 import { RsVariant } from "@/lib/utils/db";
-import { VariantAnnotation } from "./variant-annotation";
-import { GraphNode } from "@/lib/services/GraphService";
+import { VariantAnnotation } from "./VariantAnnotation";
+import { GraphNode } from "@/lib/types/derived-types";
 import { selectColors, selectDashedTypes, selectEdgeThickness, BASE_THICKNESS } from "@/app/_redux/slices/settingsSlice";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 
-function GeneNode({
+function GeneNodeDisplay({
     data
 }: {
     data: GeneNodeData;
@@ -18,9 +18,9 @@ function GeneNode({
 
     return (
         <div>
-            <div className="bg-white p-4 shadow-md rounded-xl">
+            <div className="bg-white">
                 <h2 className="text-xl font-semibold">{data.gene_name} <GeneGenecardsByName name={data.gene_name} /></h2>
-                <p className="text-gray-500">{data.gene_type || 'Unknown Type'}</p>
+                <p className="text-gray-500 truncate">{data.gene_type || 'Unknown Type'}</p>
                 {data.alias && (
                     <div className="mt-2">
                         <p className="text-gray-700">Aliases:</p>
@@ -43,7 +43,7 @@ function GeneNode({
     );
 }
 
-function ProteinNode({
+function ProteinNodeDisplay({
     data
 }: {
     data: ProteinNodeData;
@@ -51,7 +51,7 @@ function ProteinNode({
 
     return (
         <div>
-            <div className="bg-white p-4 shadow-md rounded-xl">
+            <div className="bg-white">
                 <h2 className="text-xl font-semibold">{data.name} <ProteinUniprotByName name={data.name} /></h2>
                 {data.dbxrefs && (
                     <div className="mt-2">
@@ -72,7 +72,7 @@ function ProteinNode({
     );
 }
 
-function TranscriptNode({
+function TranscriptNodeDisplay({
     data
 }: {
     data: TranscriptNodeData;
@@ -80,7 +80,7 @@ function TranscriptNode({
 
     return (
         <div>
-            <div className="bg-white p-4 shadow-md rounded-xl">
+            <div className="bg-white">
                 <p className="text-gray-600">Type: {data.transcript_type || 'Unknown Type'}</p>
                 <p className="text-gray-600 mt-2"><GeneEnsemblById id={data._id} /></p>
                 <p className="text-gray-600">Chromosome: {data.chr}</p>
@@ -93,7 +93,7 @@ function TranscriptNode({
     );
 }
 
-function VariantNode({
+function VariantNodeDisplay({
     data
 }: {
     data: RsVariant;
@@ -101,7 +101,7 @@ function VariantNode({
 
     return (
         <div>
-            <div className="bg-white p-4 shadow-md rounded-xl" key={data._id}>
+            <div className="bg-white" key={data._id}>
                 <h2 className="text-xl font-semibold">{data.rsid}</h2>
                 <p className="text-gray-600">Chromosome: {data.chr}</p>
                 <p className="text-gray-600">Position: {data["pos:long"]}</p>
@@ -115,7 +115,7 @@ function VariantNode({
     );
 }
 
-function DrugNode({
+function DrugNodeDisplay({
     data
 }: {
     data: GraphNode['drug']
@@ -140,7 +140,7 @@ function DrugNode({
     )
 }
 
-function StudyNode({
+function StudyNodeDisplay({
     data
 }: {
     data: GraphNode['study']
@@ -192,7 +192,7 @@ export default function ExpandedNode({
 
     return (
         <div
-            className="bg-white rounded-lg shadow-lg p-4 m-1 w-72 hover:shadow-xl"
+            className="bg-white rounded-lg shadow-lg p-4 m-1 hover:shadow-xl"
             style={{
                 outlineColor,
                 outlineStyle: dashed ? 'dashed' : 'solid',
@@ -202,12 +202,12 @@ export default function ExpandedNode({
             onMouseLeave={() => setHovering(false)}
         >
             {(() => {
-                if (node.gene) return <GeneNode data={node.gene} />;
-                if (node.protein) return <ProteinNode data={node.protein} />;
-                if (node.transcript) return <TranscriptNode data={node.transcript} />;
-                if (node.drug) return <DrugNode data={node.drug} />;
-                if (node.study) return <StudyNode data={node.study} />;
-                if (node.variant) return <VariantNode data={node.variant} />;
+                if (node.gene) return <GeneNodeDisplay data={node.gene} />;
+                if (node.protein) return <ProteinNodeDisplay data={node.protein} />;
+                if (node.transcript) return <TranscriptNodeDisplay data={node.transcript} />;
+                if (node.drug) return <DrugNodeDisplay data={node.drug} />;
+                if (node.study) return <StudyNodeDisplay data={node.study} />;
+                if (node.variant) return <VariantNodeDisplay data={node.variant} />;
 
                 return null;
             })()}
