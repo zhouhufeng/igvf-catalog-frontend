@@ -11,9 +11,6 @@ export type VariantNodeData = RsVariant;
 export type StudyNodeData = StudyNode;
 export type DiseaseNodeData = RouterOutputs['diseasesFromGenes'][0];
 
-export const NodeTypes = ["gene", "protein", "transcript", "drug", "variant", "study", "disease"] as const;
-export type NodeType = typeof NodeTypes[number];
-
 export interface GraphNode {
     gene?: GeneNodeData;
     protein?: ProteinNodeData;
@@ -23,3 +20,6 @@ export interface GraphNode {
     study?: StudyNodeData;
     disease?: DiseaseNodeData;
 }
+
+export type NodeType = keyof GraphNode;
+export const NodeTypes = ["gene", "protein", "transcript", "drug", "variant", "study", "disease"] as NodeType[];

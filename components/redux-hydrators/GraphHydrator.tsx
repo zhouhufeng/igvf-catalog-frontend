@@ -1,8 +1,7 @@
 "use client";
 
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
-import { selectGraphPath, setRootKey } from "@/app/_redux/slices/graphSlice";
-import { catalog } from "@/lib/catalog-interface/catalog";
+import { selectRootKey, setRootKey } from "@/app/_redux/slices/graphSlice";
 import { GraphNode } from "@/lib/types/derived-types";
 import { useEffect } from "react";
 
@@ -15,7 +14,7 @@ export default function GraphHydrator({
     serializedEdges: GraphNode[];
 }) {
     const dispatch = useAppDispatch();
-    const curGraph = useAppSelector(state => selectGraphPath(state, []))
+    const curGraph = useAppSelector(state => selectRootKey(state, graphKey))
 
     useEffect(() => {
         if (curGraph) return;
@@ -24,7 +23,7 @@ export default function GraphHydrator({
             key: graphKey,
             data: serializedEdges
         }))
-    }, [])
+    }, []);
 
     return null;
 }

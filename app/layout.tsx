@@ -27,7 +27,7 @@ export default function RootLayout({
         <Providers>
           <div className='flex flex-col h-screen justify-between'>
             <Header />
-            <div className='mb-auto'>
+            <div className='mb-auto w-screen overflow-scroll'>
               {children}
             </div>
           </div>

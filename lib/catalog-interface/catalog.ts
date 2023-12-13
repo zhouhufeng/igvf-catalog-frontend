@@ -1,7 +1,8 @@
-import { GraphNode } from "../types/derived-types";
+import { GraphNode, NodeType } from "../types/derived-types";
 import prefixes from "./definitions/prefix-to-model";
 import keys from './definitions/key-to-model';
 import BaseNode from "./model/_BaseNode";
+import nameDictionary from "./definitions/name-dictionary";
 
 
 class Catalog {
@@ -20,6 +21,11 @@ class Catalog {
             }
         }
         return new BaseNode({});
+    }
+    
+    lookupName(key: string, node_type?: NodeType) {
+        if (node_type && key === "_id") return node_type + " ID";
+        return nameDictionary[key] || key;
     }
 }
 

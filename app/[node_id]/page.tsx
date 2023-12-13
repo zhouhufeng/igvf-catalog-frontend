@@ -4,7 +4,7 @@ import SetNavigation from "@/components/SetNavigation";
 import ExpandedNode from '@/components/expanded-node';
 import GraphContainer from '@/components/main-graph/GraphContainer';
 import { catalog } from '@/lib/catalog-interface/catalog';
-import GraphHydrator from '@/components/hydrators/GraphHydrator';
+import GraphHydrator from '@/components/redux-hydrators/GraphHydrator';
 
 export default async function Page({
     params: {
@@ -29,7 +29,7 @@ export default async function Page({
 
     return (
         <div className="flex-1 flex flex-col px-6">
-            <SetNavigation title={Object.values(nodeModel)[0]._id} />
+            <SetNavigation title={nodeModel.parsed.id} />
             <GraphHydrator
                 graphKey={graphKey}
                 serializedEdges={serializedEdges}
@@ -37,14 +37,16 @@ export default async function Page({
             <div className='my-3'>
                 <h1 className='text-3xl font-bold text-gray-600'>{nodeModel?.getDisplayName()}</h1>
             </div>
-            <div className="flex flex-col border-r border-slate-400 pr-6 w-1/4">
-                <ExpandedNode node={serializedBaseNode} />
-            </div>
-            <div className="w-3/4">
-                <GraphContainer
-                    graphKey={graphKey}
-                    initialEdges={serializedEdges}
-                />
+            <div className='flex flex-row'>
+                <div className="flex flex-col border-r border-slate-400 pr-4 w-1/4">
+                    <ExpandedNode node={serializedBaseNode} />
+                </div>
+                <div className="pl-4">
+                    <GraphContainer
+                        path={[graphKey]}
+                        initialEdges={serializedEdges}
+                    />
+                </div>
             </div>
         </div>
     )

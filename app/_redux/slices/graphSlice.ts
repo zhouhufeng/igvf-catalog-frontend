@@ -3,7 +3,7 @@ import { RootState } from "../store";
 import { GraphNode } from "@/lib/types/derived-types";
 import { catalog } from "@/lib/catalog-interface/catalog";
 
-interface TableGraphNode extends GraphNode {
+export interface TableGraphNode extends GraphNode {
     isExpanded: boolean;
     isLoading: boolean;
     children: GraphTableState
@@ -40,6 +40,8 @@ const graphSlice = createSlice({
 });
 
 export const { setRootKey } = graphSlice.actions;
+
+export const selectRootKey = (state: RootState, key: string): GraphTableState | undefined => state.graph.root[key];
 
 export const selectGraphPath = (state: RootState, path: string[]) => {
     const start = state.graph.root[path[0]];

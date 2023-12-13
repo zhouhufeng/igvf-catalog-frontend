@@ -1,5 +1,5 @@
 import Modal from "@/components/Modal";
-import NodeEdgesTable from "@/components/node-edges-table/node-edges-table";
+import NodeEdgesTable from "@/components/node-edges-table/NodeEdgesTable";
 import { NodeType } from "@/lib/types/derived-types";
 
 
