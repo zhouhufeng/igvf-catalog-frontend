@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { RootState } from "../store";
 import { persistReducer } from "redux-persist";
-import { NodeType } from "@/lib/services/NodeService";
+import { NodeType } from "@/lib/types/derived-types";
 
 type ColorMapType = {
     [key in NodeType]: string;

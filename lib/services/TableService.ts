@@ -1,7 +1,5 @@
-import { apiBaseUrl } from "@/utils/api";
-import {
-    NodeType
-} from "./NodeService";
+import { apiBaseUrl } from "@/lib/utils/api";
+import { NodeType } from "../types/derived-types";
 
 const nameLookup: { [key: string]: string } = {
     "_id": "ID",
@@ -18,11 +16,12 @@ const nameLookup: { [key: string]: string } = {
 }
 
 export default class TableService {
-    static async getTableData(sourceType: NodeType, sourceId: string, destType: NodeType) {
+    static async getTableData(sourceId: string, destType: NodeType) {
+        throw new Error("need to fix");
         const data: any[] = [];
         let pageNum = 0;
         while (true) {
-            const nextPage = await fetch(`${apiBaseUrl}/${sourceType}s/${sourceId}/${destType}s?page=${pageNum++}`).then(res => res.json());
+            const nextPage = await fetch(`${apiBaseUrl}/s/${sourceId}/${destType}s?page=${pageNum++}`).then(res => res.json());
             if (nextPage.length === 0 || pageNum > 99) break;
             data.push(...nextPage);
         }

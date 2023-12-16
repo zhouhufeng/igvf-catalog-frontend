@@ -1,15 +1,19 @@
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage";
-import { persistReducer, persistStore } from "redux-persist";
+import { persistStore } from "redux-persist";
 
+import graphReducer from './slices/graphSlice';
 import searchReducer from "./slices/searchSlice";
 import uiReducer from "./slices/uiSlice";
 import settingsReducer from "./slices/settingsSlice";
+import queryReducer from "./slices/querySlice";
+
 
 const rootReducer = combineReducers({
+  graph: graphReducer,
   search: searchReducer,
   ui: uiReducer,
-  settings: settingsReducer
+  settings: settingsReducer,
+  query: queryReducer,
 });
 
 export const store = configureStore({

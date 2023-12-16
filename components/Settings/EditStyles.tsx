@@ -2,7 +2,7 @@
 
 import { useAppDispatch, useAppSelector } from '@/app/_redux/hooks';
 import { BASE_THICKNESS, addDashedType, removeDashedType, selectColors, selectDashedTypes, selectEdgeThickness, setColors, setEdgeThickness } from '@/app/_redux/slices/settingsSlice';
-import { NodeType, NodeTypes } from '@/lib/services/NodeService';
+import { NodeType, NodeTypes } from '@/lib/types/derived-types';
 import React, { useEffect, useState } from 'react';
 
 
