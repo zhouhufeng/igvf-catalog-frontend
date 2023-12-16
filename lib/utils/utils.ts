@@ -11,3 +11,11 @@ export function debounce(func: (...args: any[]) => void, delay: number) {
         }, delay);
     };
 }
+
+export function capitalize(str: string) {
+    return str[0].toUpperCase() + str.slice(1);
+}
+
+export function single<T>(data: T[] | T) {
+    return Array.isArray(data) ? data[0] : data;
+}

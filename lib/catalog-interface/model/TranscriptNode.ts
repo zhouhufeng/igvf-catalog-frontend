@@ -1,8 +1,9 @@
-import { GraphNode, TranscriptNodeData } from "@/lib/types/derived-types";
+import { GeneNodeData, GraphNode, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
 import BaseNode from "./_BaseNode";
 import { api } from "@/lib/utils/api";
 import { ParsedProperties } from "@/lib/types/graph-model-types";
-import GeneNode from "./GeneNode";
+import { catalog } from "../catalog";
+import { preprocess } from "../helpers/format-graph-nodes";
 
 
 export default class TranscriptNode extends BaseNode {
@@ -10,9 +11,10 @@ export default class TranscriptNode extends BaseNode {
     parsed: ParsedProperties;
     constructor(data: TranscriptNodeData) {
         super(data);
-        this.data = data;
+        this.data = preprocess(data);
         this.parsed = {
-            id: data._id
+            id: this.data._id,
+            displayName: "Transcript " + this.data._id,
         }
     }
 
@@ -20,10 +22,6 @@ export default class TranscriptNode extends BaseNode {
         return {
             transcript: this.data
         }
-    }
-
-    getDisplayName(): string {
-        return "Transcript " + this.data?._id || "";
     }
 
     static async get(id: string): Promise<BaseNode | null> {
@@ -37,20 +35,9 @@ export default class TranscriptNode extends BaseNode {
     }
 
     static async getAdjacent(id: string): Promise<BaseNode[] | null> {
-        return [
-            new GeneNode({
-                gene_name: "GO:0008150",
-                gene_type: "go",
-                source: "go",
-                _id: "GO:0008150",
-                chr: "",
-                start: null,
-                end: null,
-                hgnc: null,
-                alias: null,
-                source_url: null,
-                version: null
-            })
-        ];
+        const geneNodes = (await api.genesFromTranscripts.query({ transcript_id: id, verbose: "true" })).map(gene => ({ gene: gene.gene as unknown as GeneNodeData }));
+        const proteinNodes = (await api.proteinsFromTranscripts.query({ transcript_id: id, verbose: "true" })).map(protein => ({ protein: protein.protein as unknown as ProteinNodeData }));
+
+        return [...geneNodes, ...proteinNodes].map(catalog.deserialize);
     }
 }

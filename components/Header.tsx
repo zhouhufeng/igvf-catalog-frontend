@@ -31,7 +31,7 @@ export default function Header() {
                             transition={{ duration: 0.5 }}
                         >
                             {title ? (
-                                <h1 className='text-gray-500'>
+                                <h1 className='text-gray-500 truncate max-w-[300px]'>
                                     <span className='px-2'>/</span>
                                     <span>{title}</span>
                                 </h1>

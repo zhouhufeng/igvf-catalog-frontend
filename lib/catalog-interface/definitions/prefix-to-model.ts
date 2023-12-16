@@ -1,4 +1,5 @@
 import GraphNode from "../model/_BaseNode"
+import DiseaseNode from "../model/DiseaseNode";
 
 import GeneNode from "../model/GeneNode"
 import ProteinNode from "../model/ProteinNode";
@@ -22,8 +23,16 @@ const prefixes: {
         model: ProteinNode
     },
     {
+        prefix: "Q",
+        model: ProteinNode
+    },
+    {
         prefix: "rs",
         model: VariantNode
+    },
+    {
+        prefix: "ORPHANET",
+        model: DiseaseNode
     },
 ];
 

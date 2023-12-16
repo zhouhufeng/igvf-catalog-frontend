@@ -102,7 +102,7 @@ export default function MainSearchBar() {
                     text={`"${searchQuery}"`}
                     desc={exactTypes[exactType].message}
                     onClick={() => {
-                        router.push(`${exactTypes[exactType].path}/${searchQuery}`);
+                        router.push(`${searchQuery}`);
                         dispatch(addSearchHistoryEntry({
                             result: {
                                 term: searchQuery,

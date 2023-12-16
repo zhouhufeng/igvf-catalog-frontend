@@ -7,9 +7,9 @@ import nameDictionary from "./definitions/name-dictionary";
 
 class Catalog {
     node(id: string) {
-        const model = prefixes.find(p => id.toUpperCase().startsWith(p.prefix));
+        const model = prefixes.find(p => id.toUpperCase().startsWith(p.prefix.toUpperCase()));
 
-        if (!model) return null;
+        if (!model) throw new Error(`No model found for id ${id}. Add a model in prefix-to-model.ts`);
 
         return model.model;
     }
@@ -20,7 +20,7 @@ class Catalog {
                 return new model(node[key]);
             }
         }
-        return new BaseNode({});
+        throw new Error("No model found while deserializing node");
     }
     
     lookupName(key: string, node_type?: NodeType) {

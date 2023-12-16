@@ -35,13 +35,13 @@ export default async function Page({
                 serializedEdges={serializedEdges}
             />
             <div className='my-3'>
-                <h1 className='text-3xl font-bold text-gray-600'>{nodeModel?.getDisplayName()}</h1>
+                <h1 className='text-3xl font-bold text-gray-600'>{nodeModel.parsed.displayName}</h1>
             </div>
             <div className='flex flex-row'>
                 <div className="flex flex-col border-r border-slate-400 pr-4 w-1/4">
                     <ExpandedNode node={serializedBaseNode} />
                 </div>
-                <div className="pl-4">
+                <div className="pl-4 -mt-4">
                     <GraphContainer
                         path={[graphKey]}
                         initialEdges={serializedEdges}

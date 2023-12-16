@@ -9,7 +9,8 @@ export default class BaseNode {
             throw new Error("Cannot instantiate BaseNode");
         }
         this.parsed = {
-            id: ""
+            id: "",
+            displayName: "",
         }
     }
 

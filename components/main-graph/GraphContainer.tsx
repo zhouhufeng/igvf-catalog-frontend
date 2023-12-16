@@ -1,7 +1,7 @@
 "use client";
 
 import { useAppSelector } from "@/app/_redux/hooks";
-import { TableGraphNode, selectGraphPath } from "@/app/_redux/slices/graphSlice";
+import { TableGraphNode, selectGraphNodes } from "@/app/_redux/slices/graphSlice";
 import { groupTableGraphNodes } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 import { GraphNode } from "@/lib/types/derived-types";
 import { useMemo } from "react";
@@ -15,12 +15,11 @@ export default function GraphContainer({
   path: string[];
   initialEdges: GraphNode[];
 }) {
-  const reduxEdges = useAppSelector(state => selectGraphPath(state, path));
+  const reduxEdges = useAppSelector(state => selectGraphNodes(state, path));
   const edges: TableGraphNode[] = reduxEdges ? Object.values(reduxEdges) : initialEdges.map(e => {
     return {
       children: {},
       isExpanded: false,
-      isLoading: false,
       ...e
     }
   });
@@ -28,7 +27,7 @@ export default function GraphContainer({
   const groupedEdges = useMemo(() => groupTableGraphNodes(edges), [edges])
 
   return (
-    <div className="overflow-scroll space-y-4">
+    <div className="overflow-scroll space-y-4 py-4">
       {groupedEdges.map(g => (
         <NodeCollection 
           key={g.node_type}

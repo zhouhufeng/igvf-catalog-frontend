@@ -6,10 +6,12 @@ import { DrugNode, RsVariant, StudyNode } from "../utils/db";
 export type GeneNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getGeneData>>>;
 export type ProteinNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getProteinData>>>;
 export type TranscriptNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getTranscriptData>>>;
-export type DrugNodeData = DrugNode;
-export type VariantNodeData = RsVariant;
-export type StudyNodeData = StudyNode;
-export type DiseaseNodeData = RouterOutputs['diseasesFromGenes'][0];
+export type DrugNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getDrugData>>>;
+export type VariantNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getVariantData>>>;
+export type StudyNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getStudyData>>>;
+export type DiseaseNodeData = RouterOutputs['diseasesFromGenes'][0] & OntologyTerm;
+
+export type OntologyTerm = RouterOutputs['ontologyTerm'][0];
 
 export interface GraphNode {
     gene?: GeneNodeData;

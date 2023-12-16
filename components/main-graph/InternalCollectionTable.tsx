@@ -1,20 +1,24 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
+    OnChangeFn,
     SortingState,
+    Updater,
     createColumnHelper,
     flexRender,
     getCoreRowModel,
     getSortedRowModel,
     useReactTable
 } from "@tanstack/react-table";
-
-import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
-import { GraphNode, NodeType } from "@/lib/types/derived-types";
-import { catalog } from "@/lib/catalog-interface/catalog";
 import classNames from "classnames";
 
-const columnHelper = createColumnHelper<TableGraphNode>();
+import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
+import { NodeType } from "@/lib/types/derived-types";
+import { catalog } from "@/lib/catalog-interface/catalog";
+import CollectionTableRow from "./CollectionTableRow";
+import { selectSorting, setSorting } from "@/app/_redux/slices/querySlice";
+import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 
+const columnHelper = createColumnHelper<any>();
 
 export default function InternalCollectionTable({
     path,
@@ -25,27 +29,67 @@ export default function InternalCollectionTable({
     nodes: TableGraphNode[];
     nodeType: NodeType;
 }) {
-    const [sorting, setSorting] = useState<SortingState>([]);
+    const sorting = useAppSelector(state => selectSorting(state, nodeType));
+    const dispatch = useAppDispatch();
 
-    const data = useMemo(() => nodes.map(n => catalog.deserialize(n).data), [nodes]);
+    const handleSetSorting: OnChangeFn<SortingState> = (onChangeFn) => {
+        // @ts-ignore
+        const newSort = onChangeFn(sorting);
+
+        dispatch(setSorting({
+            type: nodeType,
+            state: newSort
+        }));
+    };
+
+    const data = useMemo(() => nodes.map(n => {
+        const node = catalog.deserialize(n);
+        return {
+            ...node.data,
+            _id: node.parsed.id,
+            expanded: n.isExpanded,
+            populated: Object.keys(n.children).length > 0
+        }
+    }), [nodes]);
+
+    const expandedColumn = useMemo(
+        () => columnHelper.accessor('expand', {
+            id: 'expand',
+            header: () => null,
+            cell: () => {
+                return <button>
+                    <p>X</p>
+                </button>
+            }
+        }),
+        []
+    );
 
     const columns = useMemo(
-        () => Object.keys(data[0] || {}).map((key) => (
-            columnHelper.accessor(key as any, {
-                cell: info => info.getValue(),
-                header: () => <span>{catalog.lookupName(key, nodeType)}</span>,
-            })
-        )),
+        () =>
+            [
+                expandedColumn,
+                ...Object.keys(data[0] || {}).filter(k => {
+                    if (k === '_key') return false;
+                    if (typeof data[0][k] !== 'string') return false;
+                    return true;
+                }).map((key) => (
+                    columnHelper.accessor(key as any, {
+                        cell: info => info.getValue(),
+                        header: () => <span className="capitalize">{catalog.lookupName(key, nodeType)}</span>,
+                    })
+                ))
+            ],
         [data]
     );
 
-    const table = useReactTable<TableGraphNode>({
+    const table = useReactTable<any>({
         data,
         columns,
         state: {
             sorting
         },
-        onSortingChange: setSorting,
+        onSortingChange: handleSetSorting,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
     });
@@ -65,7 +109,7 @@ export default function InternalCollectionTable({
                                         whiteSpace: "nowrap",
                                         overflow: "hidden",
                                     }}
-                                    className="p-2 cursor-pointer"
+                                    className="px-2 py-3 cursor-pointer"
                                 >
                                     <div
                                         className={classNames(
@@ -93,19 +137,10 @@ export default function InternalCollectionTable({
                 <tbody>
                     {table.getRowModel().rows.map(row => (
                         <tr key={row.id}>
-                            {row.getVisibleCells().map(cell => (
-                                <td
-                                    key={cell.id}
-                                    style={{
-                                        textOverflow: "ellipsis",
-                                        whiteSpace: "nowrap",
-                                        overflow: "hidden",
-                                    }}
-                                    className="p-2"
-                                >
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </td>
-                            ))}
+                            <CollectionTableRow
+                                row={row}
+                                path={path.concat(row.original._id)}
+                            />
                         </tr>
                     ))}
                 </tbody>

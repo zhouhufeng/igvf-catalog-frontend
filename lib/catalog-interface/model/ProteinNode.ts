@@ -1,8 +1,9 @@
 import BaseNode from "./_BaseNode";
 import { api } from "@/lib/utils/api";
-import { GraphNode, ProteinNodeData } from "@/lib/types/derived-types";
+import { GraphNode, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
 import { ParsedProperties } from "@/lib/types/graph-model-types";
-import GeneNode from "./GeneNode";
+import { catalog } from "../catalog";
+import { preprocess } from "../helpers/format-graph-nodes";
 
 
 export default class ProteinNode extends BaseNode {
@@ -10,9 +11,10 @@ export default class ProteinNode extends BaseNode {
     parsed: ParsedProperties;
     constructor(data: ProteinNodeData) {
         super(data);
-        this.data = data;
+        this.data = preprocess(data);
         this.parsed = {
-            id: data._id
+            id: this.data._id,
+            displayName: "Protein " + this.data._id,
         }
     }
 
@@ -20,10 +22,6 @@ export default class ProteinNode extends BaseNode {
         return {
             protein: this.data
         }
-    }
-
-    getDisplayName(): string {
-        return "Protein " + this.data?._id || "";
     }
 
     static async get(id: string): Promise<BaseNode | null> {
@@ -36,28 +34,12 @@ export default class ProteinNode extends BaseNode {
         }
     }
 
-    static async getAdjacent(): Promise<BaseNode[] | null> {
+    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
         try {
-            // const geneNodes = (await api.genesFromProteins.query({ protein_id: this.id })).map(gene => ({ gene }));
-            // const transcriptNodes = (await api.transcriptsFromProteins.query({ protein_id: this.id, verbose: "true" })).map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] }));
+            const geneNodes = (await api.genesFromProteins.query({ protein_id: id })).map(gene => ({ gene }));
+            const transcriptNodes = (await api.transcriptsFromProteins.query({ protein_id: id, verbose: "true" })).map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] }));
 
-            // return [...geneNodes, ...transcriptNodes];
-
-            return [
-                new GeneNode({
-                    gene_name: "GO:0008150",
-                    gene_type: "go",
-                    source: "go",
-                    _id: "GO:0008150",
-                    chr: "",
-                    start: null,
-                    end: null,
-                    hgnc: null,
-                    alias: null,
-                    source_url: null,
-                    version: null
-                })
-            ];
+            return [...geneNodes, ...transcriptNodes].map(catalog.deserialize);
         } catch (error) {
             return null;
         }

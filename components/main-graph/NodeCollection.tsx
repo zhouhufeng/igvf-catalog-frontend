@@ -14,7 +14,7 @@ export default function NodeCollection({
     group: NodeTypeGroup;
     parentPath: string[]
 }) {
-    
+
     const renderContents = () => {
         const elements: React.ReactNode[] = [];
         let curRun: TableGraphNode[] = [];
@@ -22,20 +22,26 @@ export default function NodeCollection({
         for (const node of group.nodes) {
             const nodeModel = catalog.deserialize(node);
             curRun.push(node);
-            
+
             if (node.isExpanded) {
                 elements.push(
-                    <InternalCollectionTable 
-                        path={parentPath.concat(nodeModel.parsed.id)}
+                    <InternalCollectionTable
+                        key={"table-" + nodeModel.parsed.id}
+                        path={parentPath}
                         nodes={curRun}
                         nodeType={group.node_type}
                     />
                 )
                 elements.push(
-                    <GraphContainer
-                        path={parentPath.concat(nodeModel.parsed.id)}
-                        initialEdges={Object.values(node.children)}
-                    />
+                    <Indent
+                        key={"graph-" + nodeModel.parsed.id}
+                        show={parentPath.length > 0}
+                    >
+                        <GraphContainer
+                            path={parentPath.concat(nodeModel.parsed.id)}
+                            initialEdges={[]}
+                        />
+                    </Indent>
                 );
 
                 curRun = [];
@@ -44,8 +50,9 @@ export default function NodeCollection({
 
         if (curRun.length > 0) {
             elements.push(
-                <InternalCollectionTable 
-                    path={parentPath.concat(group.node_type)}
+                <InternalCollectionTable
+                    key={"table-collection-end"}
+                    path={parentPath}
                     nodes={curRun}
                     nodeType={group.node_type}
                 />
@@ -56,9 +63,23 @@ export default function NodeCollection({
     }
 
     return (
-        <div>
-            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[0]}</p>
+        <div className="pl-1">
+            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[parentPath.length - 1]} ({group.nodes.length})</p>
             {renderContents()}
         </div>
     );
+}
+
+function Indent({
+    children,
+    show
+}: {
+    children: React.ReactNode;
+    show: boolean;
+}) {
+    return (
+        <div className={show ? "ml-4 pl-6 border-l border-black" : ""}>
+            {children}
+        </div>
+    )
 }
