@@ -1,6 +1,6 @@
 "use client";
 
-import { GeneNodeData, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
+import { GeneNodeData, ProteinNodeData, TranscriptNodeData, VariantNodeData } from "@/lib/types/derived-types";
 import { GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName, PubMedLink } from "./extLinks";
 import { RsVariant } from "@/lib/utils/db";
 import { VariantAnnotation } from "./VariantAnnotation";
@@ -96,7 +96,7 @@ function TranscriptNodeDisplay({
 function VariantNodeDisplay({
     data
 }: {
-    data: RsVariant;
+    data: VariantNodeData;
 }) {
 
     return (
@@ -104,7 +104,7 @@ function VariantNodeDisplay({
             <div className="bg-white" key={data._id}>
                 <h2 className="text-xl font-semibold">{data.rsid}</h2>
                 <p className="text-gray-600">Chromosome: {data.chr}</p>
-                <p className="text-gray-600">Position: {data["pos:long"]}</p>
+                <p className="text-gray-600">Position: {data.pos}</p>
                 {data.ref && <p className="text-gray-600">Ref: {data.ref}</p>}
                 {data.alt && <p className="text-gray-600">Alt: {data.alt}</p>}
                 <div>
@@ -128,7 +128,7 @@ function DrugNodeDisplay({
                 <h1 className="text-2xl font-bold mb-2">{data.drug_name}</h1>
             </Link>
             <div className="text-gray-700 mb-2 truncate">
-                <span className="font-bold">Drug Ontology Terms:</span> {data.drug_ontology_terms.join(', ')}
+                <span className="font-bold">Drug Ontology Terms:</span> {data.drug_ontology_terms?.join(', ')}
             </div>
             <div className="text-gray-700 mb-2 truncate">
                 <span className="font-bold">Source:</span> {data.source}
@@ -162,7 +162,7 @@ function StudyNodeDisplay({
                 <span className="font-bold">Source:</span> {data.source}
             </div>
             <div className="text-gray-700 mb-2 truncate">
-                <PubMedLink pmid={data.pmid} />
+                <PubMedLink pmid={data.pmid || ""} />
             </div>
         </>
     )

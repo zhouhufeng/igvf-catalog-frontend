@@ -22,7 +22,7 @@ export default function Page({
         <div className="p-8 h-screen">
             <div className="bg-white rounded-md border border-gray-400">
                 <h1 className="text-2xl font-bold p-4">{node_id + ": " + dest_type + "s"}</h1>
-                <NodeEdgesTable baseType={graph_type} baseId={node_id} tableType={dest_type} />
+                {/* <NodeEdgesTable baseType={graph_type} baseId={node_id} tableType={dest_type} /> */}
             </div>
         </div>
     );
