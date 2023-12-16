@@ -28,7 +28,7 @@ export default async function Page({
     const graphKey = catalog.deserialize(serializedBaseNode).parsed.id;
 
     return (
-        <div className="flex-1 flex flex-col px-6">
+        <div className="flex-1 flex flex-col px-6 opacity-0 animate-fadeIn">
             <SetNavigation title={nodeModel.parsed.id} />
             <GraphHydrator
                 graphKey={graphKey}

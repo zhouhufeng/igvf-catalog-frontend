@@ -144,7 +144,7 @@ export default function MainSearchBar() {
                         text={result.term}
                         desc={result.type}
                         onClick={() => {
-                            router.push(result.uri.split('/')[1]);
+                            router.push(result.uri.split('/')[2]);
                             dispatch(addSearchHistoryEntry({
                                 result,
                                 timestamp: Date.now(),

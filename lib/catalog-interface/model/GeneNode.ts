@@ -15,7 +15,7 @@ export default class GeneNode extends BaseNode {
         this.data = preprocess(data);
         this.parsed = {
             id: this.data._id,
-            displayName: "Gene " + this.data._id,
+            displayName: "Gene " + this.data.gene_name,
         }
     }
 
