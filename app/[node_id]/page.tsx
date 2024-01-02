@@ -5,6 +5,7 @@ import ExpandedNode from '@/components/expanded-node';
 import GraphContainer from '@/components/main-graph/GraphContainer';
 import { catalog } from '@/lib/catalog-interface/catalog';
 import GraphHydrator from '@/components/redux-hydrators/GraphHydrator';
+import FilterDisplay from '@/components/filters/FilterDisplay';
 
 export default async function Page({
     params: {
@@ -34,8 +35,9 @@ export default async function Page({
                 graphKey={graphKey}
                 serializedEdges={serializedEdges}
             />
-            <div className='my-3'>
+            <div className='my-3 flex flex-row justify-between'>
                 <h1 className='text-3xl font-bold text-gray-600'>{nodeModel.parsed.displayName}</h1>
+                <FilterDisplay />
             </div>
             <div className='flex flex-row'>
                 <div className="flex flex-col border-r border-slate-400 pr-4 w-1/4">

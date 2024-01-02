@@ -1,11 +1,9 @@
-import { useMemo, useState } from "react";
-
-import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
-import InternalCollectionTable from "./InternalCollectionTable";
 import { catalog } from "@/lib/catalog-interface/catalog";
-import GraphContainer from "./GraphContainer";
+import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 
+import GraphContainer from "./GraphContainer";
+import InternalCollectionTable from "./InternalCollectionTable";
 
 export default function NodeCollection({
     group,

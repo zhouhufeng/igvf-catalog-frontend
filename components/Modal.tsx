@@ -4,15 +4,21 @@ import { useRouter } from "next/navigation";
 
 export default function Modal({
     title,
-    children
-}:{
-    title: string,
-    children: React.ReactNode
+    children,
+    onClose
+}: {
+    title: string;
+    children: React.ReactNode;
+    onClose?: () => void;
 }) {
     const router = useRouter();
 
     const handleClose = () => {
-        router.back();
+        if (onClose) {
+            onClose();
+        } else {
+            router.back();
+        }
     }
 
     return (
@@ -30,7 +36,7 @@ export default function Modal({
                             <span className="sr-only">Close modal</span>
                         </button>
                     </div>
-                    <div className="overflow-scroll">
+                    <div className="overflow-scroll p-4 h-full">
                         {children}
                     </div>
                 </div>

@@ -1,11 +1,11 @@
-import { ParsedProperties } from "@/lib/types/graph-model-types";
-import BaseNode from "./_BaseNode";
 import { DrugNodeData, GeneNodeData, GraphNode, ProteinNodeData, VariantNodeData } from "@/lib/types/derived-types";
-import { catalog } from "../catalog";
+import { ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
-import { preprocess } from "../helpers/format-graph-nodes";
 import { single } from "@/lib/utils/utils";
 
+import { catalog } from "../catalog";
+import { preprocess } from "../helpers/format-graph-nodes";
+import BaseNode from "./_BaseNode";
 
 export default class VariantNode extends BaseNode {
     data: VariantNodeData;

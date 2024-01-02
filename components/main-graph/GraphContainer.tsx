@@ -26,7 +26,7 @@ export default function GraphContainer({
     }
   });
 
-  const groupedEdges = useMemo(() => groupTableGraphNodes(edges), [edges])
+  const groupedEdges = useMemo(() => groupTableGraphNodes(edges), [edges]);
 
   return (
     <motion.div

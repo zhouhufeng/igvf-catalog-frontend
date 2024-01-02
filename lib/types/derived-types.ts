@@ -1,7 +1,6 @@
 import NodeService from "@/lib/services/NodeService";
-import { RouterOutputs } from "../utils/api";
-import { DrugNode, RsVariant, StudyNode } from "../utils/db";
 
+import { RouterOutputs } from "../utils/api";
 
 export type GeneNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getGeneData>>>;
 export type ProteinNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getProteinData>>>;
