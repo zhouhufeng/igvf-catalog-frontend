@@ -1,4 +1,4 @@
-import { FilterCondition } from "@/lib/catalog-interface/helpers/filter";
+import { FilterCondition } from "@/lib/catalog-interface/helpers/apply-filter";
 import { NodeType } from "@/lib/types/derived-types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SortingState } from "@tanstack/react-table";

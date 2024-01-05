@@ -8,6 +8,7 @@ import { selectTitle } from '../app/_redux/slices/uiSlice';
 
 
 const navigation = [
+    { name: 'User Stories', href: '/stories', target: "_self" },
     { name: 'Web Portal', href: 'https://igvf.org/' },
     { name: 'Data Portal', href: 'https://data.igvf.org/' },
 ]
@@ -43,9 +44,9 @@ export default function Header() {
                 <div className="gap-x-12 hidden sm:flex">
                     <SettingsButton />
                     {navigation.map((item) => (
-                        <a key={item.name} href={item.href} target="_blank" className="text-sm font-semibold leading-6">
+                        <Link key={item.name} href={item.href} target={item.target ?? "_blank"} className="text-sm font-semibold leading-6">
                             {item.name}
-                        </a>
+                        </Link>
                     ))}
                 </div>
             </nav>

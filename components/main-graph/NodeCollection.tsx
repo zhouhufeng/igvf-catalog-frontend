@@ -4,7 +4,7 @@ import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-node
 
 import GraphContainer from "./GraphContainer";
 import InternalCollectionTable from "./InternalCollectionTable";
-import { checkFiltersOnNode } from "@/lib/catalog-interface/helpers/filter";
+import { checkFiltersOnNode } from "@/lib/catalog-interface/helpers/apply-filter";
 import { useAppSelector } from "@/app/_redux/hooks";
 import { selectFilters } from "@/app/_redux/slices/querySlice";
 
@@ -79,7 +79,7 @@ export default function NodeCollection({
 
     return (
         <div className="pl-1">
-            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[parentPath.length - 1]} ({`${count}` + (filters.length > 0 ? " after filter" : "")})</p>
+            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[parentPath.length - 1]} ({`${count}` + (filters.some(f => f.nodeType === group.node_type) ? " after filter" : "")})</p>
             {elements}
         </div>
     );
