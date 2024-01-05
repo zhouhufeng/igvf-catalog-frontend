@@ -1,10 +1,10 @@
 import { GeneNodeData, GraphNode, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
-import BaseNode from "./_BaseNode";
+import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
-import { ParsedProperties } from "@/lib/types/graph-model-types";
+
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
-
+import BaseNode from "./_BaseNode";
 
 export default class TranscriptNode extends BaseNode {
     data: TranscriptNodeData;
@@ -34,10 +34,28 @@ export default class TranscriptNode extends BaseNode {
         }
     }
 
-    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
-        const geneNodes = (await api.genesFromTranscripts.query({ transcript_id: id, verbose: "true" })).map(gene => ({ gene: gene.gene as unknown as GeneNodeData }));
-        const proteinNodes = (await api.proteinsFromTranscripts.query({ transcript_id: id, verbose: "true" })).map(protein => ({ protein: protein.protein as unknown as ProteinNodeData }));
+    static async getAdjacent(
+        id: string,
+        options?: GetAdjacentOptions
+    ): Promise<BaseNode[] | null> {
+        try {
+            const queries = {
+                gene: () => api.genesFromTranscripts.query({ transcript_id: id, verbose: "true", page: options?.page })
+                    .then(genes => genes.map(gene => ({ gene: gene.gene as unknown as GeneNodeData }))),
+                protein: () => api.proteinsFromTranscripts.query({ transcript_id: id, verbose: "true", page: options?.page })
+                    .then(proteins => proteins.map(protein => ({ protein: protein.protein as unknown as ProteinNodeData })))
+            };
 
-        return [...geneNodes, ...proteinNodes].map(catalog.deserialize);
+            const results = await Promise.all(
+                Object.entries(queries)
+                    .filter(([type]) => !options?.type || options.type === type)
+                    .map(([, query]) => query())
+            );
+
+            return results.flat().map(catalog.deserialize);
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
     }
 }

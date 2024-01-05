@@ -1,6 +1,6 @@
 import { DiseaseNodeData, GeneNodeData, GraphNode, OntologyTerm } from "@/lib/types/derived-types";
 import BaseNode from "./_BaseNode";
-import { ParsedProperties } from "@/lib/types/graph-model-types";
+import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
@@ -34,11 +34,14 @@ export default class DiseaseNode extends BaseNode {
         }
     }
 
-    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
+    static async getAdjacent(
+        id: string,
+        options?: GetAdjacentOptions
+    ): Promise<BaseNode[] | null> {
         try {
-            const preGenes = (await api.genesFromDiseases.query({ disease_id: id })).map(gene => (gene.gene as string));
-            
-            const geneNodes = await Promise.all(preGenes.map(async  (id_path) => {
+            const preGenes = (await api.genesFromDiseases.query({ disease_id: id, page: options?.page })).map(gene => (gene.gene as string));
+
+            const geneNodes = await Promise.all(preGenes.map(async (id_path) => {
                 const [_, gene_id] = id_path.split('/');
                 const geneNode = await GeneNode.get(gene_id);
                 if (!geneNode) throw new Error(`Gene ${gene_id} not found`);

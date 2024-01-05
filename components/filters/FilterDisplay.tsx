@@ -6,9 +6,10 @@ import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { Filter, addFilter, editFilterAtIdx, removeFilterAtIdx, selectFilters } from "@/app/_redux/slices/querySlice";
 import { NodeTypes } from "@/lib/types/derived-types";
 import EditableFilter from "./EditableFilter";
+import classNames from "classnames";
 
 const defaultFilter: Filter = {
-    nodeType: NodeTypes[0],
+    nodeType: "variant",
     fieldPath: "",
     condition: "eq",
     value: 0,
@@ -66,14 +67,16 @@ export default function FilterDisplay() {
             </button>
             {open ? (
                 <Modal title="Filters" onClose={handleClose}>
-                    <div className="space-y-4 h-full">
+                    <div className="space-y-4 h-5/6">
                         {isAdding ? (
-                            <EditableFilter
-                                filter={newFilter}
-                                onUpdate={setNewFilter}
-                                onCancel={handleCancel}
-                                onSave={handleSave}
-                            />
+                            <div className="border-b border-black pb-4 mb-4">
+                                <EditableFilter
+                                    filter={newFilter}
+                                    onUpdate={setNewFilter}
+                                    onCancel={handleCancel}
+                                    onSave={handleSave}
+                                />
+                            </div>
                         ) : (
                             <div className="flex flex-row justify-end mb-4">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 cursor-pointer" onClick={handleAdd}>

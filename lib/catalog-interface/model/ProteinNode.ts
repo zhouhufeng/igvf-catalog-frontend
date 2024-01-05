@@ -1,10 +1,10 @@
-import BaseNode from "./_BaseNode";
-import { api } from "@/lib/utils/api";
 import { GraphNode, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
-import { ParsedProperties } from "@/lib/types/graph-model-types";
+import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
+import { api } from "@/lib/utils/api";
+
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
-
+import BaseNode from "./_BaseNode";
 
 export default class ProteinNode extends BaseNode {
     data: ProteinNodeData;
@@ -34,13 +34,25 @@ export default class ProteinNode extends BaseNode {
         }
     }
 
-    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
+    static async getAdjacent(
+        id: string,
+        options?: GetAdjacentOptions
+    ): Promise<BaseNode[] | null> {
         try {
-            const geneNodes = (await api.genesFromProteins.query({ protein_id: id })).map(gene => ({ gene }));
-            const transcriptNodes = (await api.transcriptsFromProteins.query({ protein_id: id, verbose: "true" })).map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] }));
+            const queries = {
+                gene: () => api.genesFromProteins.query({ protein_id: id, page: options?.page }).then(genes => genes.map(gene => ({ gene }))),
+                transcript: () => api.transcriptsFromProteins.query({ protein_id: id, verbose: "true", page: options?.page }).then(transcripts => transcripts.map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] })))
+            };
 
-            return [...geneNodes, ...transcriptNodes].map(catalog.deserialize);
+            const results = await Promise.all(
+                Object.entries(queries)
+                    .filter(([type]) => !options?.type || options.type === type)
+                    .map(([, query]) => query())
+            );
+
+            return results.flat().map(catalog.deserialize);
         } catch (error) {
+            console.error(error);
             return null;
         }
     }
