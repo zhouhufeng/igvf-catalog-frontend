@@ -2,9 +2,6 @@ import { Filter } from "@/app/_redux/slices/querySlice";
 import { propertyDictionary, styledPropertyDictionary } from "@/lib/catalog-interface/definitions/filter-properties";
 import { NodeTypes } from "@/lib/types/derived-types";
 
-
-// export type FilterCondition = "eq" | "neq" | "gt" | "gte" | "lt" | "lte";
-
 export default function EditableFilter({
     filter: { nodeType, fieldPath, condition, value },
     onSave,
