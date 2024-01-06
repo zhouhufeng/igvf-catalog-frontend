@@ -1,11 +1,12 @@
-import { useMemo, useState } from "react";
-
-import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
-import InternalCollectionTable from "./InternalCollectionTable";
 import { catalog } from "@/lib/catalog-interface/catalog";
-import GraphContainer from "./GraphContainer";
+import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 
+import GraphContainer from "./GraphContainer";
+import InternalCollectionTable from "./InternalCollectionTable";
+import { checkFiltersOnNode } from "@/lib/catalog-interface/helpers/apply-filter";
+import { useAppSelector } from "@/app/_redux/hooks";
+import { selectFilters } from "@/app/_redux/slices/querySlice";
 
 export default function NodeCollection({
     group,
@@ -14,12 +15,17 @@ export default function NodeCollection({
     group: NodeTypeGroup;
     parentPath: string[]
 }) {
+    const filters = useAppSelector(selectFilters);
 
     const renderContents = () => {
         const elements: React.ReactNode[] = [];
         let curRun: TableGraphNode[] = [];
+        let count = 0;
 
         for (const node of group.nodes) {
+            if (!checkFiltersOnNode(node, filters)) continue;
+            count++;
+
             const nodeModel = catalog.deserialize(node);
             curRun.push(node);
 
@@ -59,13 +65,22 @@ export default function NodeCollection({
             )
         }
 
-        return elements;
+        if (elements.length === 0) {
+            return {
+                count: 0,
+                elements: <p className="pl-1">No {group.node_type}s match your filters.</p>
+            }
+        }
+
+        return { count, elements };
     }
+
+    const { count, elements } = renderContents();
 
     return (
         <div className="pl-1">
-            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[parentPath.length - 1]} ({group.nodes.length})</p>
-            {renderContents()}
+            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[parentPath.length - 1]} ({`${count}` + (filters.some(f => f.nodeType === group.node_type) ? " after filter" : "")})</p>
+            {elements}
         </div>
     );
 }

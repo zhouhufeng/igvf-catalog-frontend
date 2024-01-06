@@ -1,11 +1,11 @@
-import { ParsedProperties } from "@/lib/types/graph-model-types";
-import BaseNode from "./_BaseNode";
 import { DrugNodeData, GeneNodeData, GraphNode, ProteinNodeData, VariantNodeData } from "@/lib/types/derived-types";
-import { catalog } from "../catalog";
+import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
-import { preprocess } from "../helpers/format-graph-nodes";
 import { single } from "@/lib/utils/utils";
 
+import { catalog } from "../catalog";
+import { preprocess } from "../helpers/format-graph-nodes";
+import BaseNode from "./_BaseNode";
 
 export default class VariantNode extends BaseNode {
     data: VariantNodeData;
@@ -35,16 +35,31 @@ export default class VariantNode extends BaseNode {
         return new VariantNode(rsData[0]);
     }
 
-    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
+    static async getAdjacent(
+        id: string,
+        options?: GetAdjacentOptions
+    ): Promise<BaseNode[] | null> {
         try {
             const variant_id = preprocess(await api.variants.query({ rsid: id }))._id;
 
-            const geneEdges = (await api.genesFromVariants.query({ variant_id, verbose: "true" })).map(v => ({ gene: v.gene as GeneNodeData }));
-            const proteinEdges = (await api.proteinsFromVariants.query({ variant_id, verbose: "true" })).map(v => ({ protein: single(v.protein as unknown as ProteinNodeData) }));
-            const drugEdges = (await api.drugsFromVariants.query({ variant_id, verbose: "true" })).map(v => ({ drug: single(v.drug as unknown as DrugNodeData) }));
+            const queries = {
+                gene: () => api.genesFromVariants.query({ variant_id, verbose: "true" })
+                    .then(genes => genes.map(v => ({ gene: v.gene as GeneNodeData }))),
+                protein: () => api.proteinsFromVariants.query({ variant_id, verbose: "true" })
+                    .then(proteins => proteins.map(v => ({ protein: single(v.protein as unknown as ProteinNodeData) }))),
+                drug: () => api.drugsFromVariants.query({ variant_id, verbose: "true" })
+                    .then(drugs => drugs.map(v => ({ drug: single(v.drug as unknown as DrugNodeData) })))
+            };
 
-            return [...geneEdges, ...proteinEdges, ...drugEdges].map(catalog.deserialize);
+            const results = await Promise.all(
+                Object.entries(queries)
+                    .filter(([type]) => !options?.type || options.type === type)
+                    .map(([, query]) => query())
+            );
+
+            return results.flat().map(catalog.deserialize);
         } catch (error) {
+            console.error(error);
             return null;
         }
     }

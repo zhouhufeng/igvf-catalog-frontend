@@ -1,9 +1,15 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { RootState } from "../store";
+import { FilterCondition } from "@/lib/catalog-interface/helpers/apply-filter";
+import { NodeType } from "@/lib/types/derived-types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SortingState } from "@tanstack/react-table";
 
-interface Filter {
+import { RootState } from "../store";
 
+export interface Filter {
+    nodeType: NodeType;
+    fieldPath: string;
+    condition: FilterCondition;
+    value: number;
 }
 
 interface RootSorting {
@@ -22,11 +28,20 @@ const querySlice = createSlice({
         },
         addFilter(state, action: PayloadAction<Filter>) {
             state.filters.push(action.payload);
+        },
+        removeFilterAtIdx(state, action: PayloadAction<number>) {
+            state.filters.splice(action.payload, 1);
+        },
+        editFilterAtIdx(state, action: PayloadAction<{ idx: number, filter: Filter }>) {
+            state.filters[action.payload.idx] = action.payload.filter;
+        },
+        clearFilters(state) {
+            state.filters = [];
         }
     }
 });
 
-export const { setSorting, addFilter } = querySlice.actions;
+export const { setSorting, addFilter, removeFilterAtIdx, editFilterAtIdx, clearFilters } = querySlice.actions;
 
 export const selectFilters = (state: RootState) => state.query.filters; 
 export const selectSorting = (state: RootState, type: string) => state.query.sorting[type];

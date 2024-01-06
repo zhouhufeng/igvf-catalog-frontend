@@ -1,11 +1,11 @@
-import { GeneNodeData, GraphNode, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
-import BaseNode from "./_BaseNode";
-import { ParsedProperties } from "@/lib/types/graph-model-types";
+import { GeneNodeData, GraphNode, NodeType, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
+import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
-import { catalog } from "../catalog";
-import { preprocess } from "../helpers/format-graph-nodes";
 import { single } from "@/lib/utils/utils";
 
+import { catalog } from "../catalog";
+import { preprocess } from "../helpers/format-graph-nodes";
+import BaseNode from "./_BaseNode";
 
 export default class GeneNode extends BaseNode {
     data: GeneNodeData;
@@ -35,19 +35,25 @@ export default class GeneNode extends BaseNode {
         }
     }
 
-    static async getAdjacent(id: string): Promise<BaseNode[] | null> {
+    static async getAdjacent(
+        id: string,
+        options?: GetAdjacentOptions
+    ): Promise<BaseNode[] | null> {
         try {
-            const proteinNodes = (await api.proteinsFromGenes.query({ gene_id: id })).map(protein => ({ protein }));
-            const transcriptNodes = (await api.transcriptsFromGenes.query({ gene_id: id, verbose: "true" })).map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] }));
-            const diseaseNodes = (await api.diseasesFromGenes.query({ gene_id: id, verbose: "true" })).map(disease => ({ disease: { ...disease, ...single(disease['ontology term'] as unknown as OntologyTerm[]) } }));
-            const variantNodes = (await api.variantsFromGenes.query({ gene_id: id, verbose: "true" })).map(variant => ({ variant: variant["sequence variant"] }));
+            const queries = {
+                protein: () => api.proteinsFromGenes.query({ gene_id: id, page: options?.page }).then(proteins => proteins.map(protein => ({ protein }))),
+                transcript: () => api.transcriptsFromGenes.query({ gene_id: id, verbose: "true", page: options?.page }).then(transcripts => transcripts.map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] }))),
+                disease: () => api.diseasesFromGenes.query({ gene_id: id, verbose: "true", page: options?.page }).then(diseases => diseases.map(disease => ({ disease: { ...disease, ...single(disease['ontology term'] as unknown as OntologyTerm[]) } }))),
+                variant: () => api.variantsFromGenes.query({ gene_id: id, verbose: "true", page: options?.page }).then(variants => variants.map(variant => ({ variant: variant["sequence variant"] })))
+            };
 
-            return [
-                ...proteinNodes,
-                ...transcriptNodes,
-                ...diseaseNodes,
-                ...variantNodes
-            ].map(catalog.deserialize);
+            const results = await Promise.all(
+                Object.entries(queries)
+                    .filter(([type]) => !options?.type || options.type === type)
+                    .map(([, query]) => query())
+            );
+
+            return results.flat().map(catalog.deserialize);
         } catch (error) {
             console.error(error);
             return null;
