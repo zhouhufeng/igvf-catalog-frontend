@@ -34,11 +34,14 @@ const querySlice = createSlice({
         },
         editFilterAtIdx(state, action: PayloadAction<{ idx: number, filter: Filter }>) {
             state.filters[action.payload.idx] = action.payload.filter;
+        },
+        clearFilters(state) {
+            state.filters = [];
         }
     }
 });
 
-export const { setSorting, addFilter, removeFilterAtIdx, editFilterAtIdx } = querySlice.actions;
+export const { setSorting, addFilter, removeFilterAtIdx, editFilterAtIdx, clearFilters } = querySlice.actions;
 
 export const selectFilters = (state: RootState) => state.query.filters; 
 export const selectSorting = (state: RootState, type: string) => state.query.sorting[type];

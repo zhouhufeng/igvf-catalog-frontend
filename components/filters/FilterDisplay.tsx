@@ -41,7 +41,7 @@ export default function FilterDisplay() {
 
     const renderFilters = () => (isAdding || filters.length > 0) ? filters.map((filter, idx) =>
         <EditableFilter
-            key={filter.nodeType + filter.fieldPath}
+            key={filter.nodeType + filter.fieldPath + idx}
             filter={filter}
             onUpdate={(filter) => {
                 dispatch(editFilterAtIdx({ idx, filter }));

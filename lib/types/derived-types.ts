@@ -8,7 +8,7 @@ export type TranscriptNodeData = NonNullable<Awaited<ReturnType<typeof NodeServi
 export type DrugNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getDrugData>>>;
 export type VariantNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getVariantData>>>;
 export type StudyNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.getStudyData>>>;
-export type DiseaseNodeData = RouterOutputs['diseasesFromGenes'][0] & OntologyTerm;
+export type DiseaseNodeData = Omit<RouterOutputs['diseasesFromGenes'][0], 'gene'> & OntologyTerm & { gene?: GeneNodeData };
 
 export type OntologyTerm = RouterOutputs['ontologyTerm'][0];
 

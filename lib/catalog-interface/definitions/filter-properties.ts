@@ -120,7 +120,7 @@ export const propertyDictionary: {
         "annotations.tg_eas",
         "annotations.tg_eur",
         "annotations.tg_sas",
-    ],
+    ].sort(),
     study: [],
     disease: [],
 };

@@ -6,7 +6,7 @@ export default function Page() {
     return (
         <div className="flex-1 flex flex-col items-center justify-start">
             <div className="p-3 w-full max-w-6xl">
-                <h1 className="text-3xl font-bold mb-6">User Stories</h1>
+                <h1 className="text-3xl font-bold mb-4 pt-1">User Stories</h1>
                 {storyList.map(story => (
                     <Link
                         key={story.slug}

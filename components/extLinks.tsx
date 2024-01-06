@@ -28,3 +28,19 @@ export function PubMedLink({ pmid }: { pmid: string }): JSX.Element {
     }
     return <span>PubMed: <a href={`https://pubmed.ncbi.nlm.nih.gov/${id}`} target='_blank'>{id}</a></span>;
 }
+
+export function DiseaseSourceLink({
+    source
+}: {
+    source: string;
+}) {
+    source = source.toUpperCase();
+
+    if (source === "ORPHANET") {
+        return <a href="https://www.orpha.net/consor/cgi-bin/index.php" target="_blank">
+            Orphanet
+        </a>
+    }
+
+    return null;
+}
