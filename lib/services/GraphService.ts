@@ -11,6 +11,7 @@ export default class GraphService {
             const transcriptNodes = (await api.transcriptsFromGenes.query({ gene_id, verbose: "true" })).map(transcript => ({ transcript: (transcript.transcript as TranscriptNodeData[])[0] }));
             const diseaseNodes = (await api.diseasesFromGenes.query({ gene_id, verbose: "true" })).map(disease => ({ disease: { ...disease, ...single(disease['ontology term'] as unknown as OntologyTerm[]) } }));
 
+            // @ts-ignore
             return [...proteinNodes, ...transcriptNodes, ...diseaseNodes];
         } catch (error) {
             return null;
