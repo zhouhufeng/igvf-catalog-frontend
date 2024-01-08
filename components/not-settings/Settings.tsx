@@ -1,4 +1,4 @@
-import EditStyles from "@/components/settings/EditStyles";
+import EditStyles from "@/components/not-settings/EditStyles";
 
 
 export default function Settings() {
