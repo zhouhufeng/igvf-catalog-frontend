@@ -53,6 +53,7 @@ export default class GeneNode extends BaseNode {
                     .map(([, query]) => query())
             );
 
+            // @ts-ignore
             return results.flat().map(catalog.deserialize);
         } catch (error) {
             console.error(error);
