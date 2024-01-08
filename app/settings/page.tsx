@@ -1,4 +1,4 @@
-import Settings from "@/components/not-settings/Settings";
+import Settings from "@/components/settings/Settings";
 
 export default function Page() {
     return (
