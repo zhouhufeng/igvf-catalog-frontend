@@ -1,6 +1,5 @@
 import EditStyles from "@/components/settings/EditStyles";
 
-
 export default function Settings() {
     return (
         <div className="p-4">
