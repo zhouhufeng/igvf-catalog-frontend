@@ -1,11 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
+
 import { useAppSelector } from "@/app/_redux/hooks";
 import { TableGraphNode, selectGraphNodes } from "@/app/_redux/slices/graphSlice";
 import { groupTableGraphNodes } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 import { GraphNode } from "@/lib/types/derived-types";
-import { useMemo } from "react";
 import NodeCollection from "./NodeCollection";
+import { motion } from "framer-motion";
 
 
 export default function GraphContainer({
@@ -24,17 +26,22 @@ export default function GraphContainer({
     }
   });
 
-  const groupedEdges = useMemo(() => groupTableGraphNodes(edges), [edges])
+  const groupedEdges = useMemo(() => groupTableGraphNodes(edges), [edges]);
 
   return (
-    <div className="overflow-scroll space-y-4 py-4">
+    <motion.div
+      className="overflow-scroll space-y-4 py-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
       {groupedEdges.map(g => (
-        <NodeCollection 
+        <NodeCollection
           key={g.node_type}
           group={g}
           parentPath={path}
         />
       ))}
-    </div>
+    </motion.div>
   );
 }

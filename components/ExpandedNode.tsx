@@ -1,14 +1,14 @@
 "use client";
 
-import { GeneNodeData, ProteinNodeData, TranscriptNodeData, VariantNodeData } from "@/lib/types/derived-types";
-import { GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName, PubMedLink } from "./extLinks";
-import { RsVariant } from "@/lib/utils/db";
-import { VariantAnnotation } from "./VariantAnnotation";
-import { GraphNode } from "@/lib/types/derived-types";
-import { selectColors, selectDashedTypes, selectEdgeThickness, BASE_THICKNESS } from "@/app/_redux/slices/settingsSlice";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import Link from "next/link";
+
+import { GeneNodeData, ProteinNodeData, TranscriptNodeData, VariantNodeData } from "@/lib/types/derived-types";
+import { DiseaseSourceLink, GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName, PubMedLink } from "./extLinks";
+import { VariantAnnotation } from "./VariantAnnotation";
+import { GraphNode } from "@/lib/types/derived-types";
+import { selectColors, selectDashedTypes, selectEdgeThickness, BASE_THICKNESS } from "@/app/_redux/slices/settingsSlice";
 
 function GeneNodeDisplay({
     data
@@ -168,6 +168,31 @@ function StudyNodeDisplay({
     )
 }
 
+function DiseaseNodeDisplay({
+    data
+}: {
+    data: GraphNode['disease']
+}) {
+    if (!data) return null;
+
+    return (
+        <>
+            <div className="bg-white space-y-4">
+                {data.gene ? <h2 className="font-bold text-gray-600">
+                    Linked to gene&nbsp;
+                    <Link href={`/${data.gene._id}`}>
+                        {data.gene.gene_name}
+                    </Link>
+                </h2> : null}
+                <h2 className="font-bold text-gray-600">Association Type: {data.association_type}</h2>
+                <h2 className="font-bold text-gray-600">Association Status: {data.association_status}</h2>
+                <h2 className="font-bold text-gray-600">Ontology: {data.term_id}</h2>
+                {data.source && <h2 className="font-bold text-gray-600">Source: <DiseaseSourceLink source={data.source} /></h2>}
+            </div>
+        </>
+    )
+}
+
 export default function ExpandedNode({
     node
 }: {
@@ -192,11 +217,11 @@ export default function ExpandedNode({
 
     return (
         <div
-            className="bg-white rounded-lg shadow-lg p-4 m-1 hover:shadow-xl"
+            className="bg-white rounded-lg shadow-lg p-4 m-1 hover:shadow-xl w-[18vw]"
             style={{
                 outlineColor,
                 outlineStyle: dashed ? 'dashed' : 'solid',
-                outlineWidth: (edgeThickness / BASE_THICKNESS) + (hovering ? 0.5 : 0) + 0.5
+                outlineWidth: (edgeThickness / BASE_THICKNESS) + (hovering ? 0.5 : 0) + 0.5,
             }}
             onMouseEnter={() => setHovering(true)}
             onMouseLeave={() => setHovering(false)}
@@ -208,6 +233,7 @@ export default function ExpandedNode({
                 if (node.drug) return <DrugNodeDisplay data={node.drug} />;
                 if (node.study) return <StudyNodeDisplay data={node.study} />;
                 if (node.variant) return <VariantNodeDisplay data={node.variant} />;
+                if (node.disease) return <DiseaseNodeDisplay data={node.disease} />;
 
                 return null;
             })()}
