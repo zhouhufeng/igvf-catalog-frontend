@@ -1,11 +1,11 @@
 import { DiseaseNodeData, GeneNodeData, GraphNode, OntologyTerm } from "@/lib/types/derived-types";
-import BaseNode from "./_BaseNode";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
+
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
+import BaseNode from "./_BaseNode";
 import GeneNode from "./GeneNode";
-
 
 export default class DiseaseNode extends BaseNode {
     data: DiseaseNodeData;
