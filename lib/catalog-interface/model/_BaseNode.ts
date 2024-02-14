@@ -29,4 +29,6 @@ export default class BaseNode {
     static async getAdjacent(id: string, options?: GetAdjacentOptions): Promise<BaseNode[] | null> {
         throw new Error("Not implemented");
     }
+
+    excludedColumns: null | string[] = null;
 }

@@ -1,9 +1,10 @@
-import { PayloadAction, createEntityAdapter, createSlice } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage";
-import { RootState } from "../store";
-import { QueryType } from "@/lib/services/AutocompleteService";
 import { exactTypes } from "@/components/MainSearchBar";
+import { QueryType } from "@/lib/services/AutocompleteService";
+import { createEntityAdapter, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+
+import { RootState } from "../store";
 
 interface SearchHistoryEntryType {
     term: string,

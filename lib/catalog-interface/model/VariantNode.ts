@@ -63,4 +63,6 @@ export default class VariantNode extends BaseNode {
             return null;
         }
     }
+
+    excludedColumns: null | string[] = ["alt", "ref", "_key", "_rev", "qual", "format"]
 }

@@ -1,22 +1,13 @@
-import { useMemo } from "react";
-import {
-    OnChangeFn,
-    SortingState,
-    Updater,
-    createColumnHelper,
-    flexRender,
-    getCoreRowModel,
-    getSortedRowModel,
-    useReactTable
-} from "@tanstack/react-table";
-import classNames from "classnames";
-
-import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
-import { NodeType } from "@/lib/types/derived-types";
-import { catalog } from "@/lib/catalog-interface/catalog";
-import CollectionTableRow from "./CollectionTableRow";
-import { selectSorting, setSorting } from "@/app/_redux/slices/querySlice";
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
+import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
+import { selectSorting, setSorting } from "@/app/_redux/slices/querySlice";
+import { catalog } from "@/lib/catalog-interface/catalog";
+import { NodeType } from "@/lib/types/derived-types";
+import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, OnChangeFn, SortingState, Updater, useReactTable } from "@tanstack/react-table";
+import classNames from "classnames";
+import { useMemo } from "react";
+
+import CollectionTableRow from "./CollectionTableRow";
 
 const columnHelper = createColumnHelper<any>();
 
@@ -31,6 +22,8 @@ export default function InternalCollectionTable({
 }) {
     const sorting = useAppSelector(state => selectSorting(state, nodeType));
     const dispatch = useAppDispatch();
+    
+    const model = useMemo(() => catalog.deserialize(nodes[0]), [nodes])
 
     const handleSetSorting: OnChangeFn<SortingState> = (onChangeFn) => {
         // @ts-ignore
@@ -72,6 +65,9 @@ export default function InternalCollectionTable({
                 ...Object.keys(data[0] || {}).filter(k => {
                     if (k === '_key') return false;
                     if (typeof data[0][k] !== 'string') return false;
+
+                    if (model.excludedColumns && model.excludedColumns.includes(k)) return false;
+
                     return true;
                 }).map((key) => (
                     columnHelper.accessor(key as any, {
