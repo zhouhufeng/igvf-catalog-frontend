@@ -1,11 +1,11 @@
-import { notFound } from 'next/navigation';
-
-import SetNavigation from "@/components/SetNavigation";
 import ExpandedNode from '@/components/ExpandedNode';
-import GraphContainer from '@/components/main-graph/GraphContainer';
-import { catalog } from '@/lib/catalog-interface/catalog';
-import GraphHydrator from '@/components/redux-hydrators/GraphHydrator';
 import FilterDisplay from '@/components/filters/FilterDisplay';
+import GraphContainer from '@/components/main-graph/GraphContainer';
+import GraphHydrator from '@/components/redux-hydrators/GraphHydrator';
+import SetNavigation from "@/components/SetNavigation";
+import { catalog } from '@/lib/catalog-interface/catalog';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
 export default async function Page({
     params: {
@@ -37,7 +37,12 @@ export default async function Page({
             />
             <div className='my-3 flex flex-row justify-between'>
                 <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{nodeModel.parsed.displayName}</h1>
-                <FilterDisplay />
+                <div className='space-x-4'>
+                    <Link href={`/${node_id}/live-graph`} className="px-8 py-3 border border-black rounded-full no-underline text-black font-bold">
+                        Live Graph
+                    </Link>
+                    <FilterDisplay />
+                </div>
             </div>
             <div className='flex flex-row'>
                 <div className="flex flex-col border-r border-slate-400 pr-4">
