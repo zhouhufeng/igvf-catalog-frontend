@@ -22,6 +22,15 @@ class Catalog {
         }
         throw new Error("No model found while deserializing node");
     }
+
+    deserializeToStatic(node: GraphNode) {
+        for (const { key, model } of keys) {
+            if (key in node) {
+                return model;
+            }
+        }
+        throw new Error("No model found while deserializing node");
+    }
     
     lookupName(key: string, node_type?: NodeType) {
         if (node_type && key === "_id") return node_type + " ID";
