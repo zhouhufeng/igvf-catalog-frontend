@@ -1,4 +1,5 @@
 import { GraphNode } from "../types/derived-types";
+import { LiveGraphData } from "../types/live-graph-types";
 import { catalog } from "./catalog";
 
 
@@ -21,6 +22,8 @@ export default class GraphTraverser {
                 depth: 0
             }
         ];
+
+        visited.add(catalog.deserialize(this.startNode).parsed.id);
 
         while (queue.length > 0) {
             const { node, depth: nodeDepth } = queue.shift()!;
@@ -48,10 +51,24 @@ export default class GraphTraverser {
             }
         }
 
+        return GraphTraverser.mapToRegraphFormat(nodes, edges);
+    }
+
+    static async mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[]) {
         return {
-            nodes,
-            edges
-        }
+            nodes: nodes.map(n => {
+                const model = catalog.deserialize(n);
+                return {
+                    id: model.parsed.id,
+                    label: model.parsed.displayName
+                }
+            }),
+            edges: edges.map(e => ({
+                source: e.source,
+                target: e.target,
+                id: `${e.source}-${e.target}`
+            }))
+        } as LiveGraphData;
     }
 }
 

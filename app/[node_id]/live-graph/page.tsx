@@ -1,7 +1,9 @@
+"use client";
+
 import SetNavigation from "@/components/SetNavigation";
 import LiveGraph from "@/components/live-graph/LiveGraph";
 import { catalog } from '@/lib/catalog-interface/catalog';
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 
 export default async function Page({
     params: {
@@ -12,12 +14,9 @@ export default async function Page({
         node_id: string;
     };
 }) {
-    const model = catalog.node(node_id);
-    const nodeModel = await model?.get(node_id);
+    const nodeModel = await catalog.node(node_id)?.get(node_id);
 
-    if (!nodeModel) {
-        notFound();
-    }
+    if (!nodeModel) notFound();
 
     return (
         <div className="px-6 opacity-0 animate-fadeIn">
