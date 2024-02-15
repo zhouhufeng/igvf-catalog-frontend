@@ -4,7 +4,6 @@ import keys from './definitions/key-to-model';
 import BaseNode from "./model/_BaseNode";
 import nameDictionary from "./definitions/name-dictionary";
 
-
 class Catalog {
     node(id: string) {
         const model = prefixes.find(p => id.toUpperCase().startsWith(p.prefix.toUpperCase()));
