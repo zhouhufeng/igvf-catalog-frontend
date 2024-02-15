@@ -1,12 +1,16 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import { RootState } from "../store";
-import { persistReducer } from "redux-persist";
 import { NodeType } from "@/lib/types/derived-types";
+import { persistReducer } from "redux-persist";
 
 type ColorMapType = {
     [key in NodeType]: string;
 };
+
+export interface LiveGraphSettings {
+    loadDepth: number;
+}
 
 export const BASE_THICKNESS = 10;
 
@@ -16,6 +20,9 @@ const settingsSlice = createSlice({
         colorMap: {} as ColorMapType,
         dashedTypes: [] as NodeType[],
         edgeThickness: BASE_THICKNESS,
+        liveGraph: {
+            loadDepth: 2,
+        } as LiveGraphSettings
     },
     reducers: {
         setColors: (state, action: PayloadAction<ColorMapType>) => {
@@ -31,15 +38,22 @@ const settingsSlice = createSlice({
         },
         setEdgeThickness: (state, action: PayloadAction<number>) => {
             state.edgeThickness = action.payload;
+        },
+        setLiveGraphSettings: (state, action: PayloadAction<Partial<LiveGraphSettings>>) => {
+            state.liveGraph = {
+                ...state.liveGraph,
+                ...action.payload,
+            };
         }
     }
 });
 
-export const { setColors, addDashedType, removeDashedType, setEdgeThickness } = settingsSlice.actions;
+export const { setColors, addDashedType, removeDashedType, setEdgeThickness, setLiveGraphSettings } = settingsSlice.actions;
 
 export const selectColors = (state: RootState) => state.settings.colorMap;
 export const selectDashedTypes = (state: RootState) => state.settings.dashedTypes;
 export const selectEdgeThickness = (state: RootState) => state.settings.edgeThickness;
+export const selectLiveGraphSettings = (state: RootState) => state.settings.liveGraph;
 
 const settingsReducer = settingsSlice.reducer;
 
