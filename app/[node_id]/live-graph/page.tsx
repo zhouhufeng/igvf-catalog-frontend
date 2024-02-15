@@ -2,6 +2,7 @@
 
 import SetNavigation from "@/components/SetNavigation";
 import LiveGraph from "@/components/live-graph/LiveGraph";
+import LiveGraphSettingsBar from "@/components/live-graph/LiveGraphSettingsBar";
 import { catalog } from '@/lib/catalog-interface/catalog';
 import { notFound } from "next/navigation";
 
@@ -19,12 +20,13 @@ export default async function Page({
     if (!nodeModel) notFound();
 
     return (
-        <div className="px-6 opacity-0 animate-fadeIn">
+        <div className="opacity-0 animate-fadeIn flex flex-col justify-start h-full">
             <SetNavigation title={nodeModel.parsed.id} />
-            <div className='my-3 flex flex-row justify-between'>
-                <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{nodeModel.parsed.displayName}</h1>
+            <div className='my-3 flex flex-row justify-between px-6 space-x-4'>
+                <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{nodeModel.parsed.displayName} - Live Graph</h1>
+                <LiveGraphSettingsBar />
             </div>
-            <div>
+            <div className="relative flex-row flex-1 w-screen">
                 <LiveGraph startNode={nodeModel.serialize()} />
             </div>
         </div>

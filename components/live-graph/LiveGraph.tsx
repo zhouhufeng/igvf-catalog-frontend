@@ -1,35 +1,105 @@
 "use client";
 
+import Loading from "@/app/[node_id]/loading";
+import { useAppSelector } from "@/app/_redux/hooks";
+import { selectLiveGraphSettings } from "@/app/_redux/slices/settingsSlice";
 import GraphTraverser from "@/lib/catalog-interface/GraphTraverser";
 import { GraphNode } from "@/lib/types/derived-types";
 import { LiveGraphData } from "@/lib/types/live-graph-types";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GraphCanvas } from "reagraph";
+
+enum LoadingStatus {
+    Loading,
+    Loaded,
+    Error
+}
 
 export default function LiveGraph({
     startNode
 }: {
     startNode: GraphNode;
 }) {
+    const traverser = useMemo(() => new GraphTraverser(), []);
     const [data, setData] = useState<LiveGraphData | null>(null);
+    const [status, setStatus] = useState(LoadingStatus.Loading);
+
+    const _settings = useAppSelector(selectLiveGraphSettings);
+    const [settings, setSettings] = useState(_settings);
+    const [pendingSettingsChange, setPendingSettingsChange] = useState(false);
 
     useEffect(() => {
-        new GraphTraverser(startNode)
-            .fetchGraphToDepth(3)
+        // setData(testData);
+        // setStatus(LoadingStatus.Loaded);
+        // return;
+        setStatus(LoadingStatus.Loading);
+        traverser
+            .fetchGraphToDepth(startNode, settings)
             .then(res => {
                 setData(res);
+                setStatus(LoadingStatus.Loaded);
+            })
+            .catch(e => {
+                console.error(e);
+                setStatus(LoadingStatus.Error);
             });
-    }, []);
+    }, [settings]);
 
-    if (!data) return <p>Loading...</p>
+
+    useEffect(() => {
+        if (JSON.stringify(settings) !== JSON.stringify(_settings)) {
+            if (traverser.responseIsCached(startNode, _settings)) {
+                setSettings(_settings);
+            } else {
+                setPendingSettingsChange(true);
+            }
+        }
+    }, [_settings]);
+
+    const handleUpdateSettings = () => {
+        setSettings(_settings);
+        setPendingSettingsChange(false);
+    };
+
+    if (status === LoadingStatus.Error) return (
+        <div className="flex flex-col items-center justify-center h-[80vh]">
+            <div className="flex flex-col items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-12 h-12 m-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                </svg>
+                <h1 className="text-2xl font-bold">An error occurred while fetching the graph.</h1>
+                <p className="mt-2">Please try again later.</p>
+            </div>
+        </div>
+    )
+
+    if (!data || status !== LoadingStatus.Loaded) return (
+        <div className="flex flex-col items-center justify-center h-[80vh]">
+            <div className="flex flex-col items-center">
+                <Loading />
+                <h1 className="text-2xl font-bold">Reconstructing the graph from scratch for you. Hang tight...</h1>
+                <p className="mt-2">This will take a moment for larger graphs.</p>
+            </div>
+        </div>
+    )
 
     return (
-        <div style={{ height: 500, width: 500 }}>
+        <>
+            {pendingSettingsChange ? (
+                <div className="absolute w-screen z-10 px-6 py-3 flex flex-row items-center justify-between border-t border-b border-gray-500 opacity-0 animate-fadeIn bg-white">
+                    <h2 className="text-lg">You have pending settings changes.</h2>
+                    <button
+                        onClick={handleUpdateSettings}
+                        className="bg-primary px-6 py-2 rounded-lg text-white"
+                    >Apply and Reload</button>
+                </div>
+            ) : null}
             <GraphCanvas
+                key={JSON.stringify(settings)}
                 nodes={data.nodes}
                 edges={data.edges}
             />
-        </div>
+        </>
     );
 }
 
