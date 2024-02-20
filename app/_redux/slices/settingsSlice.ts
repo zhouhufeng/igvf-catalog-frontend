@@ -1,10 +1,11 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import storage from "redux-persist/lib/storage";
-import { RootState } from "../store";
 import { NodeType } from "@/lib/types/derived-types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
-type ColorMapType = {
+import { RootState } from "../store";
+
+export type ColorMapType = {
     [key in NodeType]: string;
 };
 

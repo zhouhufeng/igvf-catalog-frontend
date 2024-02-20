@@ -1,9 +1,9 @@
-import { LiveGraphSettings } from "@/app/_redux/slices/settingsSlice";
+import { ColorMapType, LiveGraphSettings } from "@/app/_redux/slices/settingsSlice";
+
 import { GraphNode } from "../types/derived-types";
 import { LiveGraphData } from "../types/live-graph-types";
 import { catalog } from "./catalog";
 import BaseNode from "./model/_BaseNode";
-
 
 export default class GraphTraverser {
     adjacentCache = new Map<string, Awaited<ReturnType<typeof BaseNode.getAdjacent>>>();
@@ -21,13 +21,13 @@ export default class GraphTraverser {
         return adjacent;
     }
 
-    async fetchGraphToDepth(startNode: GraphNode, settings: LiveGraphSettings) {
+    async fetchGraphToDepth(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
         const startModel = catalog.deserialize(startNode);
         const cacheKey = startModel.parsed.id + "-" + settings.loadDepth;
 
         if (this.rawNodesAndEdgesResponse.has(cacheKey)) {
             const { nodes, edges } = this.rawNodesAndEdgesResponse.get(cacheKey)!;
-            return GraphTraverser.mapToRegraphFormat(nodes, edges);
+            return GraphTraverser.mapToRegraphFormat(nodes, edges, colors);
         }
         const nodes: GraphNode[] = [];
         const edges: GraphEdge[] = [];
@@ -72,11 +72,11 @@ export default class GraphTraverser {
 
         this.rawNodesAndEdgesResponse.set(cacheKey, { nodes, edges });
 
-        return GraphTraverser.mapToRegraphFormat(nodes, edges);
+        return GraphTraverser.mapToRegraphFormat(nodes, edges, colors);
     }
 
-    async getStoredRawGraph(startNode: GraphNode, settings: LiveGraphSettings) {
-        return this.fetchGraphToDepth(startNode, settings);
+    async getStoredRawGraph(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
+        return this.fetchGraphToDepth(startNode, settings, colors);
     }
 
     responseIsCached(startNode: GraphNode, settings: LiveGraphSettings) {
@@ -88,7 +88,7 @@ export default class GraphTraverser {
         return `${startModel.parsed.id}-${settings.loadDepth}`;
     }
 
-    static mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[]) {
+    static mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[], colors: ColorMapType) {
         let edgesSet = new Set<string>();
 
         const mappedEdges = edges.map<LiveGraphData['edges'][0]>(e => ({
@@ -111,7 +111,8 @@ export default class GraphTraverser {
                 const model = catalog.deserialize(n);
                 return {
                     id: model.parsed.id,
-                    label: model.parsed.displayName
+                    label: model.parsed.displayName,
+                    fill: colors[catalog.modelToKey(model)] ?? undefined,
                 }
             }),
             edges: dedupedEdges

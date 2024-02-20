@@ -1,8 +1,8 @@
 import { GraphNode, NodeType } from "../types/derived-types";
-import prefixes from "./definitions/prefix-to-model";
 import keys from './definitions/key-to-model';
-import BaseNode from "./model/_BaseNode";
 import nameDictionary from "./definitions/name-dictionary";
+import prefixes from "./definitions/prefix-to-model";
+import BaseNode from "./model/_BaseNode";
 
 class Catalog {
     node(id: string) {
@@ -29,6 +29,15 @@ class Catalog {
             }
         }
         throw new Error("No model found while deserializing node");
+    }
+
+    modelToKey(model: BaseNode) {
+        for (const { key, model: m } of keys) {
+            if (model instanceof m) {
+                return key;
+            }
+        }
+        throw new Error("No key found for model");
     }
     
     lookupName(key: string, node_type?: NodeType) {
