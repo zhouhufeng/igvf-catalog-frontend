@@ -2,7 +2,7 @@
 
 import Loading from "@/app/[node_id]/loading";
 import { useAppSelector } from "@/app/_redux/hooks";
-import { selectLiveGraphSettings } from "@/app/_redux/slices/settingsSlice";
+import { selectColors, selectLiveGraphSettings } from "@/app/_redux/slices/settingsSlice";
 import GraphTraverser from "@/lib/catalog-interface/GraphTraverser";
 import { GraphNode } from "@/lib/types/derived-types";
 import { LiveGraphData } from "@/lib/types/live-graph-types";
@@ -20,6 +20,7 @@ export default function LiveGraph({
 }: {
     startNode: GraphNode;
 }) {
+    const colors = useAppSelector(selectColors);
     const traverser = useMemo(() => new GraphTraverser(), []);
     const [data, setData] = useState<LiveGraphData | null>(null);
     const [status, setStatus] = useState(LoadingStatus.Loading);
@@ -34,7 +35,7 @@ export default function LiveGraph({
         // return;
         setStatus(LoadingStatus.Loading);
         traverser
-            .fetchGraphToDepth(startNode, settings)
+            .fetchGraphToDepth(startNode, settings, colors)
             .then(res => {
                 setData(res);
                 setStatus(LoadingStatus.Loaded);

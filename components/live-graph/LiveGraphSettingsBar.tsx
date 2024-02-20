@@ -17,6 +17,7 @@ export default function LiveGraphSettingsBar() {
             <label className="flex flex-col">
                 <span>Graph Load Depth</span>
                 <select value={settings.loadDepth} onChange={handleSelectChange}>
+                    <option>1</option>
                     <option>2</option>
                     <option>3</option>
                     <option>4</option>
