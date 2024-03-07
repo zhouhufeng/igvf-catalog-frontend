@@ -27,7 +27,7 @@ export default class GraphTraverser {
 
         if (this.rawNodesAndEdgesResponse.has(cacheKey)) {
             const { nodes, edges } = this.rawNodesAndEdgesResponse.get(cacheKey)!;
-            return GraphTraverser.mapToRegraphFormat(nodes, edges, colors);
+            return GraphTraverser.mapToRegraphFormat(nodes, edges, colors, settings);
         }
         const nodes: GraphNode[] = [];
         const edges: GraphEdge[] = [];
@@ -72,7 +72,7 @@ export default class GraphTraverser {
 
         this.rawNodesAndEdgesResponse.set(cacheKey, { nodes, edges });
 
-        return GraphTraverser.mapToRegraphFormat(nodes, edges, colors);
+        return GraphTraverser.mapToRegraphFormat(nodes, edges, colors, settings);
     }
 
     async getStoredRawGraph(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
@@ -88,7 +88,7 @@ export default class GraphTraverser {
         return `${startModel.parsed.id}-${settings.loadDepth}`;
     }
 
-    static mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[], colors: ColorMapType) {
+    static mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[], colors: ColorMapType, settings: LiveGraphSettings) {
         let edgesSet = new Set<string>();
 
         const mappedEdges = edges.map<LiveGraphData['edges'][0]>(e => ({
@@ -96,6 +96,24 @@ export default class GraphTraverser {
             target: e.target,
             id: `${e.source}-${e.target}`,
         }));
+
+        const targetConnections = new Map<string, number>();
+        mappedEdges.forEach(edge => {
+            const target = edge.target;
+            if (targetConnections.has(target)) {
+                targetConnections.set(target, targetConnections.get(target)! + 1);
+            } else {
+                targetConnections.set(target, 1);
+            }
+        });
+
+        const denseTargets = new Set<string>();
+
+        const sortedTargets = Array.from(targetConnections.entries()).sort((a, b) => b[1] - a[1]);
+
+        for (let i = 0; i < Math.min(7, sortedTargets.length); i++) {
+            denseTargets.add(sortedTargets[i][0]);
+        }
 
         const dedupedEdges = mappedEdges.filter(e => {
             if (edgesSet.has(e.id)) {
@@ -113,6 +131,10 @@ export default class GraphTraverser {
                     id: model.parsed.id,
                     label: model.parsed.displayName,
                     fill: colors[catalog.modelToKey(model)] ?? undefined,
+                    data: {
+                        rootNode: catalog.modelToKey(model),
+                        density: denseTargets.has(model.parsed.id) ? "dense" : "sparse",
+                    },
                 }
             }),
             edges: dedupedEdges

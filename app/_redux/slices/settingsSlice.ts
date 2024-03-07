@@ -4,14 +4,21 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import { RootState } from "../store";
+import { SizingType } from "reagraph";
 
 export type ColorMapType = {
     [key in NodeType]: string;
 };
 
-export interface LiveGraphSettings {
-    loadDepth: number;
-}
+export type ClusterStrategy = "unclustered" | "rootNode" | "density";
+
+const liveGraph = {
+    loadDepth: 2,
+    clusterStrategy: "unclustered" as ClusterStrategy,
+    sizingType: "centrality" as SizingType,
+};
+
+export type LiveGraphSettings = typeof liveGraph;
 
 export const BASE_THICKNESS = 10;
 
@@ -21,9 +28,7 @@ const settingsSlice = createSlice({
         colorMap: {} as ColorMapType,
         dashedTypes: [] as NodeType[],
         edgeThickness: BASE_THICKNESS,
-        liveGraph: {
-            loadDepth: 2,
-        } as LiveGraphSettings
+        liveGraph,
     },
     reducers: {
         setColors: (state, action: PayloadAction<ColorMapType>) => {

@@ -99,6 +99,8 @@ export default function LiveGraph({
                 key={JSON.stringify(settings)}
                 nodes={data.nodes}
                 edges={data.edges}
+                sizingType={settings.sizingType}
+                clusterAttribute={settings.clusterStrategy === "unclustered" ? undefined : settings.clusterStrategy}
             />
         </>
     );
