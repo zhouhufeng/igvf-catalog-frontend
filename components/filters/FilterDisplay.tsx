@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Modal from "../Modal";
+import Modal from "../ui/Modal";
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { Filter, addFilter, editFilterAtIdx, removeFilterAtIdx, selectFilters } from "@/app/_redux/slices/querySlice";
 import { NodeTypes } from "@/lib/types/derived-types";

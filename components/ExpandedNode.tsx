@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import Link from "next/link";
 
 import { GeneNodeData, ProteinNodeData, TranscriptNodeData, VariantNodeData } from "@/lib/types/derived-types";
-import { DiseaseSourceLink, GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName, PubMedLink } from "./extLinks";
+import { DiseaseSourceLink, GeneEnsemblById, GeneGenecardsByName, ProteinUniprotById, ProteinUniprotByName, PubMedLink } from "./ui/extLinks";
 import { VariantAnnotation } from "./VariantAnnotation";
 import { GraphNode } from "@/lib/types/derived-types";
 import { selectColors, selectDashedTypes, selectEdgeThickness, BASE_THICKNESS } from "@/app/_redux/slices/settingsSlice";

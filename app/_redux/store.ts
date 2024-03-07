@@ -3,16 +3,18 @@ import { persistStore } from "redux-persist";
 
 import graphReducer from './slices/graphSlice';
 import queryReducer from "./slices/querySlice";
+import regionViewReducer from "./slices/regionViewSlice";
 import searchReducer from "./slices/searchSlice";
 import settingsReducer from "./slices/settingsSlice";
 import uiReducer from "./slices/uiSlice";
 
 const rootReducer = combineReducers({
   graph: graphReducer,
+  query: queryReducer,
+  regionView: regionViewReducer,
   search: searchReducer,
   ui: uiReducer,
   settings: settingsReducer,
-  query: queryReducer,
 });
 
 export const store = configureStore({

@@ -3,8 +3,8 @@
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion';
 
-import { useAppSelector } from '../app/_redux/hooks';
-import { selectTitle } from '../app/_redux/slices/uiSlice';
+import { useAppSelector } from '../../app/_redux/hooks';
+import { selectTitle } from '../../app/_redux/slices/uiSlice';
 
 
 const navigation = [

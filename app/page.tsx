@@ -1,6 +1,6 @@
 "use client"
 
-import Footer from "@/components/Footer"
+import Footer from "@/components/ui/Footer"
 import MainSearchBar from "@/components/MainSearchBar"
 
 export default function Home() {
