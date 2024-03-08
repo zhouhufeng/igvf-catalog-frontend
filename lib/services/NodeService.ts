@@ -1,4 +1,3 @@
-import { RsVariant, getVariantByRsid } from "@/lib/utils/db";
 import { api } from "@/lib/utils/api";
 
 export default class NodeService {

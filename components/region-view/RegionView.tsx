@@ -2,7 +2,7 @@
 
 import useDeserializedNode from "@/lib/catalog-interface/hooks/useDeserializedNode";
 import { GraphNode } from "@/lib/types/derived-types";
-import { trpc } from "@/lib/utils/api";
+import { useQuery } from '@tanstack/react-query';
 
 export default function RegionView({
     parentNode,
@@ -11,8 +11,11 @@ export default function RegionView({
 }) {
     const model = useDeserializedNode(parentNode);
 
-    const regulatoryRegion = trpc.regulatoryRegions.useQuery({
-        region: "",
+    const regulatoryRegion = useQuery({
+        queryKey: ['regulatoryRegion', model?.parsed.id],
+        queryFn: async () => {
+            // ...
+        },
     })
 
     return (

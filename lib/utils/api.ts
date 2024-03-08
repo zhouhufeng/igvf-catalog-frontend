@@ -1,7 +1,6 @@
 import { type igvfCatalogRouter as AppRouter } from 'igvf-catalog/src/routers/_app';
 import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client';
 import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
-import { createTRPCReact } from '@trpc/react-query';
 
 export const apiBaseUrl = "https://api.catalog.igvf.org/api";
 
@@ -19,8 +18,6 @@ export const api = createTRPCProxyClient<AppRouter>({
         })
     ]
 });
-
-export const trpc = createTRPCReact<AppRouter>();
 
 /**
  * Inference helper for inputs.

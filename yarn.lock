@@ -228,6 +228,18 @@
   dependencies:
     tslib "^2.4.0"
 
+"@tanstack/query-core@5.25.0":
+  version "5.25.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.25.0.tgz#e08ed0a9fad34c8005d1a282e57280031ac50cdc"
+  integrity sha512-vlobHP64HTuSE68lWF1mEhwSRC5Q7gaT+a/m9S+ItuN+ruSOxe1rFnR9j0ACWQ314BPhBEVKfBQ6mHL0OWfdbQ==
+
+"@tanstack/react-query@^5.25.0":
+  version "5.25.0"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.25.0.tgz#f4dac794cf10dd956aa56dbbdf67049a5ba2669d"
+  integrity sha512-u+n5R7mLO7RmeiIonpaCRVXNRWtZEef/aVZ/XGWRPa7trBIvGtzlfo0Ah7ZtnTYfrKEVwnZ/tzRCBcoiqJ/tFw==
+  dependencies:
+    "@tanstack/query-core" "5.25.0"
+
 "@tanstack/react-table@^8.9.11":
   version "8.13.2"
   resolved "https://registry.yarnpkg.com/@tanstack/react-table/-/react-table-8.13.2.tgz#a3aa737ae464abc651f68daa7e82dca17813606c"
@@ -245,15 +257,10 @@
   resolved "https://registry.yarnpkg.com/@tokenizer/token/-/token-0.3.0.tgz#fe98a93fe789247e998c75e74e9c7c63217aa276"
   integrity sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==
 
-"@trpc/client@^10.36.0", "@trpc/client@^10.8.1":
+"@trpc/client@^10.45.1", "@trpc/client@^10.8.1":
   version "10.45.1"
   resolved "https://registry.yarnpkg.com/@trpc/client/-/client-10.45.1.tgz#ec80a5252ac9d3e5df2e5d8ddce1e23fc5caf5ac"
   integrity sha512-nVbAk1xpIiI64WgzXGgfxPOGgHoYvffn1IsjV1D/Ri7DL4BKuo2qtZ7UQ+OuHkzH2M8j4ikSVBDpk545fOdvpw==
-
-"@trpc/react-query@^10.45.1":
-  version "10.45.1"
-  resolved "https://registry.yarnpkg.com/@trpc/react-query/-/react-query-10.45.1.tgz#48454552cf5ce9a4d99712065f9309994b2476a5"
-  integrity sha512-48OOMpwVjQFUQJqlp9/tW1lqESZg9YEqB5iVci7mYaDzZPEs/YUcV85XKvYzgeW+7K9oShX/JMVce8muON/6uQ==
 
 "@trpc/server@^10.36.0", "@trpc/server@^10.8.1":
   version "10.45.1"
