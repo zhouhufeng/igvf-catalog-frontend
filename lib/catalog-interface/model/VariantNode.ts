@@ -64,5 +64,15 @@ export default class VariantNode extends BaseNode {
         }
     }
 
+    static async query({
+        region
+    }: {
+        region: string;
+    }) {
+        const variants = await api.variants.query({ region }).then(v => v.map(n => ({ variant: n })));
+
+        return variants.map(catalog.deserialize);
+    }
+
     excludedColumns: null | string[] = ["alt", "ref", "_key", "_rev", "qual", "format"]
 }

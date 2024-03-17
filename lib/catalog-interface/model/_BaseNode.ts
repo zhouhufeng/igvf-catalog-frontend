@@ -30,5 +30,13 @@ export default class BaseNode {
         throw new Error("Not implemented");
     }
 
+    static async query({
+        region,
+    }: {
+        region: string;
+    }): Promise<BaseNode[] | null> {
+        return [];
+    }
+
     excludedColumns: null | string[] = null;
 }

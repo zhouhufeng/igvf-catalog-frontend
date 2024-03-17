@@ -1,8 +1,10 @@
-import { GraphNode, NodeType } from "../types/derived-types";
 import keys from './definitions/key-to-model';
-import nameDictionary from "./definitions/name-dictionary";
 import prefixes from "./definitions/prefix-to-model";
+import { GraphNode, NodeType } from "../types/derived-types";
+import { GenomicCoordinates } from "../types/exact-types/region-types";
+import nameDictionary from "./definitions/name-dictionary";
 import BaseNode from "./model/_BaseNode";
+import GenomicRegion from "./helpers/GenomicRegion";
 
 class Catalog {
     node(id: string) {
@@ -11,6 +13,11 @@ class Catalog {
         if (!model) throw new Error(`No model found for id ${id}. Add a model in prefix-to-model.ts`);
 
         return model.model;
+    }
+
+    region(coords: GenomicCoordinates) {
+        const model = new GenomicRegion(coords);
+        return model;
     }
 
     deserialize(node: GraphNode): BaseNode {

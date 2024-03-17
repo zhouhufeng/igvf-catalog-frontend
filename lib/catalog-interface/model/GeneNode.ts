@@ -1,4 +1,4 @@
-import { GeneNodeData, GraphNode, NodeType, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
+import { GeneNodeData, GraphNode, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
 import { single } from "@/lib/utils/utils";
@@ -59,5 +59,15 @@ export default class GeneNode extends BaseNode {
             console.error(error);
             return null;
         }
+    }
+
+    static async query({
+        region
+    }: {
+        region: string;
+    }) {
+        const genes = await api.genes.query({ region }).then(v => (v as any[]).map(n => ({ gene: n })));
+
+        return genes.map(catalog.deserialize);
     }
 }
