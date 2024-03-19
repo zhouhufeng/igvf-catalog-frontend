@@ -1,3 +1,4 @@
+import BaseNode from "./_BaseNode";
 import { GeneNodeData, GraphNode, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
@@ -5,7 +6,6 @@ import { single } from "@/lib/utils/utils";
 
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
-import BaseNode from "./_BaseNode";
 
 export default class GeneNode extends BaseNode {
     data: GeneNodeData;

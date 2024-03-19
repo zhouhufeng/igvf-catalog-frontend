@@ -1,38 +1,42 @@
-import BaseNode from "../model/_BaseNode";
 import { GraphNode } from "@/lib/types/derived-types";
 import { GenomicCoordinates } from "../../types/exact-types/region-types";
-import keys from "../definitions/key-to-model";
+import { api } from "@/lib/utils/api";
 
 export default class GenomicRegion {
-    coords: GenomicCoordinates;
+    region: GenomicCoordinates;
     constructor(_coords: string) {
-        this.coords = normalizeRegionString(_coords);
+        this.region = normalizeRegionString(_coords);
     }
 
     async getRegionNodes(): Promise<GraphNode[] | null> {
-        const promises: Promise<BaseNode[] | null>[] = [];
-        for (const { model } of keys) {
-            promises.push(
-                model.query({ region: this.coords })
-            )
+        try {
+            const { region } = this;
+            const promises: Promise<GraphNode[] | null>[] = [
+                api.genes.query({ region }).then(v => (v as any[]).map(n => ({ gene: n }))),
+                api.variants.query({ region }).then(v => v.map(n => ({ variant: n }))),
+                api.transcripts.query({ region }).then(v => (v as any[]).map(n => ({ transcript: n }))),
+            ];
+
+            const all = await Promise.all(promises);
+
+            return all
+                .flat()
+                .filter((node) => node !== null) as GraphNode[];
+        } catch (error) {
+            console.error(error);
+            return null;
         }
-
-        const all = await Promise.all(promises);
-
-        return all
-            .flat()
-            .filter((node) => node !== null)
-            .map((node) => node!.serialize());
     }
 }
 
-function normalizeRegionString(coordinates: string): GenomicCoordinates {
+export function normalizeRegionString(coordinates: string): GenomicCoordinates {
     const { chromosome, start, end } = parseRegionString(coordinates);
 
     return `chr${chromosome}:${start}-${end}`;
 }
 
 function parseRegionString(coordinates: string) {
+    coordinates = decodeURIComponent(coordinates);
     const regex = /^(chr)?(\d+):(\d+)-(\d+)$/;
     const match = coordinates.match(regex);
 
@@ -45,5 +49,5 @@ function parseRegionString(coordinates: string) {
         };
     }
 
-    throw new Error('Invalid region string format');
+    throw new Error('Invalid region string format: ' + coordinates);
 }

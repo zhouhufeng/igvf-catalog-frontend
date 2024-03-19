@@ -192,7 +192,12 @@ export default function MainSearchBar() {
                         desc={res.result.type}
                         icon={<div className="text-gray-500 text-sm">{typeToEmoji[res.result.type] || '🔎'}</div>}
                         onClick={() => {
-                            router.push(res.result.uri.split('/')[2]);
+                            const identifier = res.result.uri.split('/')[2];
+                            if (exactTypes[res.result.type] && exactTypes[res.result.type].path) {
+                                router.push(`${exactTypes[res.result.type].path}/${identifier}`);
+                            } else {
+                                router.push(identifier);
+                            }
                             dispatch(addSearchHistoryEntry({
                                 result: res.result,
                                 timestamp: Date.now(),

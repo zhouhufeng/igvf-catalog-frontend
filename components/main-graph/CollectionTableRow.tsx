@@ -30,7 +30,7 @@ export default function CollectionTableRow({
 
             if (!data) throw new Error("Couldn't load adjacent nodes");
 
-            const serialized = data.map(n => n.serialize())
+            const serialized = data.map(n => n.serialize());
 
             dispatch(toggleExpandAtPath({ path }));
             dispatch(setPathChildren({ path, data: serialized }));
