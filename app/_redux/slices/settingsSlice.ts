@@ -29,6 +29,7 @@ const settingsSlice = createSlice({
         dashedTypes: [] as NodeType[],
         edgeThickness: BASE_THICKNESS,
         liveGraph,
+        graphPageSize: 10,
     },
     reducers: {
         setColors: (state, action: PayloadAction<ColorMapType>) => {
@@ -50,16 +51,20 @@ const settingsSlice = createSlice({
                 ...state.liveGraph,
                 ...action.payload,
             };
+        },
+        setGraphPageSize: (state, action: PayloadAction<number>) => {
+            state.graphPageSize = action.payload;
         }
     }
 });
 
-export const { setColors, addDashedType, removeDashedType, setEdgeThickness, setLiveGraphSettings } = settingsSlice.actions;
+export const { setColors, addDashedType, removeDashedType, setEdgeThickness, setLiveGraphSettings, setGraphPageSize } = settingsSlice.actions;
 
 export const selectColors = (state: RootState) => state.settings.colorMap;
 export const selectDashedTypes = (state: RootState) => state.settings.dashedTypes;
 export const selectEdgeThickness = (state: RootState) => state.settings.edgeThickness;
 export const selectLiveGraphSettings = (state: RootState) => state.settings.liveGraph;
+export const selectGraphPageSize = (state: RootState) => state.settings.graphPageSize;
 
 const settingsReducer = settingsSlice.reducer;
 

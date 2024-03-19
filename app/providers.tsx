@@ -13,7 +13,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             <ReduxProvider>
                 <QueryClientProvider client={queryClient}>
                     {children}
-                    <Next13ProgressBar height="4px" color="#ef106a" options={{ showSpinner: false, minimum: 0.25 }} showOnShallow />
+                    <Next13ProgressBar height="4px" color="#337788" options={{ showSpinner: false, minimum: 0.25 }} showOnShallow />
                 </QueryClientProvider>
             </ReduxProvider>
         </>

@@ -29,7 +29,7 @@ export default async function Page({
     const graphKey = nodeModel.parsed.id;
 
     return (
-        <div className="px-6 opacity-0 animate-fadeIn">
+        <div className="px-6 animate-in fade-in duration-300">
             <SetNavigation title={nodeModel.parsed.id} />
             <GraphHydrator
                 graphKey={graphKey}

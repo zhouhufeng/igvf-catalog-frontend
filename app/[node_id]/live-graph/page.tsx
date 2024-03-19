@@ -20,7 +20,7 @@ export default async function Page({
     if (!nodeModel) notFound();
 
     return (
-        <div className="opacity-0 animate-fadeIn flex flex-col justify-start h-full">
+        <div className="flex flex-col justify-start h-full">
             <SetNavigation title={nodeModel.parsed.id} />
             <div className='my-3 flex flex-row justify-between px-6 space-x-4'>
                 <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{nodeModel.parsed.displayName} - Live Graph</h1>

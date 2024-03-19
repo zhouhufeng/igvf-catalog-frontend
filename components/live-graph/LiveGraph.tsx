@@ -87,7 +87,7 @@ export default function LiveGraph({
     return (
         <>
             {pendingSettingsChange ? (
-                <div className="absolute w-screen z-10 px-6 py-3 flex flex-row items-center justify-between border-t border-b border-gray-500 opacity-0 animate-fadeIn bg-white">
+                <div className="absolute w-screen z-10 px-6 py-3 flex flex-row items-center justify-between border-t border-b border-gray-500 bg-white">
                     <h2 className="text-lg">You have pending settings changes.</h2>
                     <button
                         onClick={handleUpdateSettings}

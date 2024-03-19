@@ -1,6 +1,7 @@
 import { GraphNode } from "@/lib/types/derived-types";
-import { GenomicCoordinates } from "../../types/exact-types/region-types";
 import { api } from "@/lib/utils/api";
+
+import { GenomicCoordinates } from "../../types/exact-types/region-types";
 
 export default class GenomicRegion {
     region: GenomicCoordinates;
@@ -26,6 +27,13 @@ export default class GenomicRegion {
             console.error(error);
             return null;
         }
+    }
+
+    async getRegulatoryRegions(page?: number) {
+        const { region } = this;
+        const regions = await api.regulatoryRegions.query({ region, page });
+
+        return regions;
     }
 }
 
