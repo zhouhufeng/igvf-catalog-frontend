@@ -9,13 +9,14 @@ import { notFound } from 'next/navigation';
 
 export default async function Page({
     params: {
-        node_id,
+        node_id: _node_id,
     },
 }: {
     params: {
         node_id: string;
     };
 }) {
+    const node_id = decodeURIComponent(_node_id);
     const model = catalog.node(node_id);
     const nodeModel = await model?.get(node_id);
     const edges = await model?.getAdjacent(node_id);

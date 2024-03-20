@@ -1,15 +1,20 @@
-import GraphNode from "../model/_BaseNode"
+import BaseNode from "../model/_BaseNode";
 import DiseaseNode from "../model/DiseaseNode";
-
-import GeneNode from "../model/GeneNode"
+import GeneNode from "../model/GeneNode";
 import ProteinNode from "../model/ProteinNode";
 import TranscriptNode from "../model/TranscriptNode";
-import VariantNode from "../model/VariantNode";
+import SPDIVariantNode from "../model/variant/SPDIVariantNode";
+import VariantNode from "../model/variant/VariantNode";
 
-const prefixes: {
+type PrefixEl = {
     prefix: string;
-    model: typeof GraphNode; 
-}[] = [
+    model: typeof BaseNode;
+} | {
+    regex: RegExp;
+    model: typeof BaseNode;
+}
+
+const prefixes: PrefixEl[] = [
     {
         prefix: "ENSG",
         model: GeneNode
@@ -33,6 +38,14 @@ const prefixes: {
     {
         prefix: "ORPHANET",
         model: DiseaseNode
+    },
+    {
+        regex: /^\d+_\d+_[A-Z]_[A-Z]$/,
+        model: SPDIVariantNode,
+    },
+    {
+        regex: /NC_\d+\.\d+:\d+:[A-Z]:[A-Z]/,
+        model: SPDIVariantNode,
     },
 ];
 

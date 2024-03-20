@@ -61,7 +61,7 @@ const typeToEmoji: TypeToEmoji = {
 
 export const exactTypes: {
     [key: string]: {
-        regex: RegExp;
+        regexList: RegExp[];
         path?: string;
         message: string;
         tip: string;
@@ -69,24 +69,32 @@ export const exactTypes: {
     };
 } = {
     "rs": {
-        regex: /^rs\d+$/i,
+        regexList: [/^rs\d+$/i,],
         message: "You're entering a variant ID. Enter the full ID then click here or press enter.",
         tip: "Variant Type with rsXXXXX. Ex: rs123",
         exampleQuery: "rs123",
     },
     "chr": {
         path: "/region",
-        regex: /^(chr)?(\d+):(\d+)-(\d+)$/i,
+        regexList: [/^(chr)?(\d+):(\d+)-(\d+)$/i,],
         message: "You're entering coordinates. Enter the full coordinate then click here or press enter.",
         tip: "Region with chrX:XXXX-XXXX or X:XXXX-XXXX. Ex: chr1:1000-2000",
         exampleQuery: "chr1:1000-2000",
+    },
+    "spdi": {
+        regexList: [/^\d+_\d+_[A-Z]_[A-Z]$/, /NC_\d+\.\d+:\d+:[A-Z]:[A-Z]/],
+        message: "You're entering a SPDI. Enter the full SPDI then click here or press enter.",
+        tip: "SPDI like XX_XXXXXXXX_A_A or NC_XXXXXX.X:XXXXXXX:X:X. Ex: NC_000007.14:24926826:C:A or 17_46935905_T_C",
+        exampleQuery: "NC_000007.14:24926826:C:A",
     }
 }
 
 const getTypeFromQuery = (query: string): keyof typeof exactTypes | null => {
     for (const [prefix, type] of Object.entries(exactTypes)) {
-        if (type.regex.test(query)) {
-            return prefix as keyof typeof exactTypes;
+        for (const regex of type.regexList) {
+            if (regex.test(query)) {
+                return prefix as keyof typeof exactTypes;
+            }
         }
     }
     return null;

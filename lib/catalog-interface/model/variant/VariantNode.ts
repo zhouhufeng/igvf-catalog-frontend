@@ -3,9 +3,9 @@ import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-ty
 import { api } from "@/lib/utils/api";
 import { single } from "@/lib/utils/utils";
 
-import { catalog } from "../catalog";
-import { preprocess } from "../helpers/format-graph-nodes";
-import BaseNode from "./_BaseNode";
+import BaseNode from "../_BaseNode";
+import { catalog } from "../../catalog";
+import { preprocess } from "../../helpers/format-graph-nodes";
 
 export default class VariantNode extends BaseNode {
     data: VariantNodeData;
@@ -29,7 +29,7 @@ export default class VariantNode extends BaseNode {
         return "Variant " + this.data?._id || "";
     }
 
-    static async get(id: string): Promise<BaseNode> {
+    static async get(id: string): Promise<BaseNode | null> {
         const rsData = await api.variants.query({ rsid: id });
 
         return new VariantNode(rsData[0]);

@@ -1,12 +1,21 @@
-import BaseNode from "./model/_BaseNode";
-import prefixes from "./definitions/prefix-to-model";
-import keys from './definitions/key-to-model';
 import { GraphNode, NodeType } from "../types/derived-types";
+import keys from './definitions/key-to-model';
 import nameDictionary from "./definitions/name-dictionary";
+import prefixes from "./definitions/prefix-to-model";
+import BaseNode from "./model/_BaseNode";
 
 class Catalog {
     node(id: string) {
-        const model = prefixes.find(p => id.toUpperCase().startsWith(p.prefix.toUpperCase()));
+        id = decodeURIComponent(id);
+        const model = prefixes.find(p => {
+            if ('prefix' in p) {
+                return id.startsWith(p.prefix);
+            }
+            if ('regex' in p) {
+                return p.regex.test(id);
+            }
+            return false;
+        });
 
         if (!model) throw new Error(`No model found for id ${id}. Add a model in prefix-to-model.ts`);
 
