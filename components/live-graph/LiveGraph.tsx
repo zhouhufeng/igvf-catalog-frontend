@@ -6,7 +6,6 @@ import { selectColors, selectLiveGraphSettings } from "@/app/_redux/slices/setti
 import GraphTraverser from "@/lib/catalog-interface/GraphTraverser";
 import { catalog } from "@/lib/catalog-interface/catalog";
 import { GraphNode } from "@/lib/types/derived-types";
-import { LiveGraphData } from "@/lib/types/live-graph-types";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";

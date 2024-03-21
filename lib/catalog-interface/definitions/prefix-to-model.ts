@@ -3,8 +3,8 @@ import DiseaseNode from "../model/DiseaseNode";
 import GeneNode from "../model/GeneNode";
 import ProteinNode from "../model/ProteinNode";
 import TranscriptNode from "../model/TranscriptNode";
-import SPDIVariantNode from "../model/variant/SPDIVariantNode";
-import VariantNode from "../model/variant/VariantNode";
+import SPDIVariantNode from "../model/variant-group/SPDIVariantNode";
+import VariantNode from "../model/variant-group/VariantNode";
 
 type PrefixEl = {
     prefix: string;

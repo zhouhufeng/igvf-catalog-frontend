@@ -1,0 +1,1 @@
+export type MainGraphLocation = "node" | "region";

@@ -8,14 +8,16 @@ import { groupTableGraphNodes } from "@/lib/catalog-interface/helpers/format-gra
 import { GraphNode } from "@/lib/types/derived-types";
 import NodeCollection from "./NodeCollection";
 import { motion } from "framer-motion";
-
+import { MainGraphLocation } from "./main-graph-types";
 
 export default function GraphContainer({
   path,
   initialEdges,
+  location,
 }: {
   path: string[];
   initialEdges: GraphNode[];
+  location?: MainGraphLocation;
 }) {
   const reduxEdges = useAppSelector(state => selectGraphNodes(state, path));
   const edges: TableGraphNode[] = reduxEdges ? Object.values(reduxEdges) : initialEdges.map(e => {
