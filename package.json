@@ -27,7 +27,7 @@
     "clsx": "^2.1.0",
     "framer-motion": "^10.16.1",
     "igvf-catalog": "git+https://github.com/IGVF-DACC/igvf-catalog.git",
-    "next": "^14.1.1-canary.52",
+    "next": "^14.1.4",
     "next13-progressbar": "^1.0.2",
     "papaparse": "^5.4.1",
     "postcss": "8.4.27",

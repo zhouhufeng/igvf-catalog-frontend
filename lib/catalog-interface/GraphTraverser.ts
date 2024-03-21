@@ -6,27 +6,37 @@ import { catalog } from "./catalog";
 import BaseNode from "./model/_BaseNode";
 
 export default class GraphTraverser {
-    adjacentCache = new Map<string, Awaited<ReturnType<typeof BaseNode.getAdjacent>>>();
-    rawNodesAndEdgesResponse = new Map<string, { nodes: GraphNode[], edges: GraphEdge[] }>();
+    static adjacentCache = new Map<string, Awaited<ReturnType<typeof BaseNode.getAdjacent>>>();
+    static rawNodesAndEdgesResponse = new Map<string, { nodes: GraphNode[], edges: GraphEdge[] }>();
 
     async getNodeAdjacent(node: GraphNode, model: BaseNode) {
         const adjacent = await catalog.deserializeToStatic(node).getAdjacent(model.parsed.id);
 
-        if (this.adjacentCache.has(model.parsed.id)) {
-            return this.adjacentCache.get(model.parsed.id)!;
+        if (GraphTraverser.adjacentCache.has(model.parsed.id)) {
+            return GraphTraverser.adjacentCache.get(model.parsed.id)!;
         } else {
-            this.adjacentCache.set(model.parsed.id, adjacent);
+            GraphTraverser.adjacentCache.set(model.parsed.id, adjacent);
         }
 
         return adjacent;
     }
 
-    async fetchGraphToDepth(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
+    async fetchGraphToDepth({
+        startNode,
+        settings,
+        colors,
+        signal,
+    }: {
+        startNode: GraphNode;
+        settings: LiveGraphSettings;
+        colors: ColorMapType;
+        signal?: AbortSignal;
+    }) {
         const startModel = catalog.deserialize(startNode);
         const cacheKey = startModel.parsed.id + "-" + settings.loadDepth;
 
-        if (this.rawNodesAndEdgesResponse.has(cacheKey)) {
-            const { nodes, edges } = this.rawNodesAndEdgesResponse.get(cacheKey)!;
+        if (GraphTraverser.rawNodesAndEdgesResponse.has(cacheKey)) {
+            const { nodes, edges } = GraphTraverser.rawNodesAndEdgesResponse.get(cacheKey)!;
             return GraphTraverser.mapToRegraphFormat(nodes, edges, colors, settings);
         }
         const nodes: GraphNode[] = [];
@@ -45,6 +55,8 @@ export default class GraphTraverser {
         visited.add(startModel.parsed.id);
 
         while (queue.length > 0) {
+            if (signal?.aborted) throw new Error("Cancellation Requested");
+
             const { node, depth: nodeDepth } = queue.shift()!;
             const model = catalog.deserialize(node);
             if (!nodes.some(n => catalog.deserialize(n).parsed.id === model.parsed.id)) {
@@ -70,18 +82,22 @@ export default class GraphTraverser {
             }
         }
 
-        this.rawNodesAndEdgesResponse.set(cacheKey, { nodes, edges });
+        GraphTraverser.rawNodesAndEdgesResponse.set(cacheKey, { nodes, edges });
 
         return GraphTraverser.mapToRegraphFormat(nodes, edges, colors, settings);
     }
 
     async getStoredRawGraph(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
-        return this.fetchGraphToDepth(startNode, settings, colors);
+        return this.fetchGraphToDepth({
+            startNode,
+            settings,
+            colors
+        });
     }
 
     responseIsCached(startNode: GraphNode, settings: LiveGraphSettings) {
         const startModel = catalog.deserialize(startNode);
-        return this.rawNodesAndEdgesResponse.has(GraphTraverser.getCacheKey(startModel, settings));
+        return GraphTraverser.rawNodesAndEdgesResponse.has(GraphTraverser.getCacheKey(startModel, settings));
     }
 
     static getCacheKey(startModel: BaseNode, settings: LiveGraphSettings) {
