@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { selectGraphPageSize, setGraphPageSize } from "@/app/_redux/slices/settingsSlice";
+import Link from "next/link";
 
 const columnHelper = createColumnHelper<any>();
 
@@ -89,29 +90,48 @@ export default function RegulatoryGraph({
         }
     }), [regions]);
 
-    const expandedColumn = useMemo(
-        () => columnHelper.accessor('expand', {
-            id: 'expand',
-            header: () => null,
-            cell: () => {
-                return <button>
-                    <p>X</p>
-                </button>
-            }
-        }),
-        []
-    );
-
     const columns = useMemo(
         () =>
             [
-                expandedColumn,
-                ...(Object.keys(data[0] || {}) as Array<keyof typeof data[0]>).map((key) => (
-                    columnHelper.accessor(key as any, {
-                        cell: info => info.getValue(),
-                        header: () => <span className="capitalize">{catalog.lookupName(key)}</span>,
-                    })
-                ))
+                columnHelper.accessor('expand', {
+                    header: () => null,
+                    cell: () => {
+                        return <button>
+                            <p>X</p>
+                        </button>
+                    }
+                }),
+                columnHelper.accessor('region', {
+                    header: () => <span>Region</span>,
+                    cell: ({ row: { original } }) => {
+                        const converted = `${original.chr}:${original.start}-${original.end}`;
+                        return <Link href={`/region/${converted}`} className="underline text-brand">
+                            {converted}
+                        </Link>
+                    }
+                }),
+                columnHelper.accessor('biochemical_activity', {
+                    header: () => <span>Biochemical Activity</span>,
+                    cell: ({ row: { original } }) => {
+                        return original.biochemical_activity;
+                    }
+                }),
+                columnHelper.accessor('biochemical_activity_description', {
+                    header: () => <span>Biochemical Activity Description</span>,
+                    cell: (cell) => cell.getValue()
+                }),
+                columnHelper.accessor('type', {
+                    header: () => <span>Type</span>,
+                    cell: (cell) => cell.getValue()
+                }),
+                columnHelper.accessor('source', {
+                    header: () => <span>Source</span>,
+                    cell: (cell) => cell.getValue()
+                }),
+                columnHelper.accessor('source_url', {
+                    header: () => <span>Source URL</span>,
+                    cell: (cell) => <a href={cell.getValue()} target="_blank" className="underline text-brand">{cell.getValue()}</a>
+                }),
             ],
         [data]
     );

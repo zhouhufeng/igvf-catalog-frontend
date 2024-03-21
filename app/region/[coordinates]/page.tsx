@@ -1,6 +1,6 @@
 import GraphContainer from "@/components/main-graph/GraphContainer";
 import GraphHydrator from "@/components/redux-hydrators/GraphHydrator";
-import RegulatoryGraph from "@/components/side-table/RegulatoryGraph";
+import RegulatoryGraph from "@/components/regulatory-table/RegulatoryGraph";
 import GenomicRegion, { normalizeRegionString } from "@/lib/catalog-interface/helpers/GenomicRegion";
 import { notFound } from "next/navigation";
 

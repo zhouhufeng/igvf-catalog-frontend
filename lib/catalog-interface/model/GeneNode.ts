@@ -6,6 +6,7 @@ import { single } from "@/lib/utils/utils";
 
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default class GeneNode extends BaseNode {
     data: GeneNodeData;
@@ -69,5 +70,13 @@ export default class GeneNode extends BaseNode {
         const genes = await api.genes.query({ region }).then(v => (v as any[]).map(n => ({ gene: n })));
 
         return genes.map(catalog.deserialize);
+    }
+
+    static getTableColumns() {
+        const columnHelper = createColumnHelper<GeneNodeData>();
+
+        return [
+
+        ]
     }
 }
