@@ -78,14 +78,14 @@ export const exactTypes: {
         path: "/region",
         regexList: [/^(chr)?(\d+):(\d+)-(\d+)$/i,],
         message: "You're entering coordinates. Enter the full coordinate then click here or press enter.",
-        tip: "Region with chrX:XXXX-XXXX or X:XXXX-XXXX. Ex: chr1:1000-2000",
-        exampleQuery: "chr1:1000-2000",
+        tip: "Region with chrX:XXXX-XXXX or X:XXXX-XXXX. Ex: chr1:1000-20000",
+        exampleQuery: "chr1:1000-20000",
     },
     "spdi": {
         regexList: [/^\d+_\d+_[A-Z]_[A-Z]$/, /NC_\d+\.\d+:\d+:[A-Z]:[A-Z]/],
         message: "You're entering a SPDI. Enter the full SPDI then click here or press enter.",
         tip: "SPDI like XX_XXXXXXXX_A_A or NC_XXXXXX.X:XXXXXXX:X:X. Ex: NC_000007.14:24926826:C:A or 17_46935905_T_C",
-        exampleQuery: "NC_000007.14:24926826:C:A",
+        exampleQuery: "17_46935905_T_C",
     }
 }
 
@@ -127,15 +127,12 @@ export default function MainSearchBar() {
                     text={`"${searchQuery}"`}
                     desc={exactTypes[exactType].message}
                     onClick={() => {
-                        if (exactTypes[exactType].path) {
-                            router.push(`${exactTypes[exactType].path}/${searchQuery}`);
-                        } else {
-                            router.push(`${searchQuery}`);
-                        }
+                        const uri = exactTypes[exactType].path ? `${exactTypes[exactType].path}/${searchQuery}` : `${searchQuery}`;
+                        router.push(uri);
                         dispatch(addSearchHistoryEntry({
                             result: {
                                 term: searchQuery,
-                                uri: `${exactTypes[exactType].path}/${searchQuery}`,
+                                uri,
                                 type: exactType,
                             },
                             timestamp: Date.now(),
@@ -173,7 +170,7 @@ export default function MainSearchBar() {
                         text={result.term}
                         desc={result.type}
                         onClick={() => {
-                            router.push(result.uri.split('/')[2]);
+                            router.push(result.uri);
                             dispatch(addSearchHistoryEntry({
                                 result,
                                 timestamp: Date.now(),
@@ -200,12 +197,7 @@ export default function MainSearchBar() {
                         desc={res.result.type}
                         icon={<div className="text-gray-500 text-sm">{typeToEmoji[res.result.type] || '🔎'}</div>}
                         onClick={() => {
-                            const identifier = res.result.uri.split('/')[2];
-                            if (exactTypes[res.result.type] && exactTypes[res.result.type].path) {
-                                router.push(`${exactTypes[res.result.type].path}/${identifier}`);
-                            } else {
-                                router.push(identifier);
-                            }
+                            router.push(res.result.uri);
                             dispatch(addSearchHistoryEntry({
                                 result: res.result,
                                 timestamp: Date.now(),
@@ -367,12 +359,15 @@ export default function MainSearchBar() {
                                 const suggestions = renderSearchSuggestions();
 
                                 if (Array.isArray(suggestions)) {
+                                    console.log(suggestions);
                                     for (const suggestion of suggestions) {
                                         if (React.isValidElement(suggestion) && suggestion.props.onClick) {
                                             suggestion.props.onClick();
                                             break;
                                         }
                                     }
+                                } else if (React.isValidElement(suggestions) && (suggestions.props as any).onClick) {
+                                    (suggestions.props as any).onClick();
                                 }
                             }
                         }}

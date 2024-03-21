@@ -37,7 +37,7 @@ export default async function Page({
                 serializedEdges={serializedEdges}
             />
             <div className='my-3 flex flex-row justify-between'>
-                <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{nodeModel.parsed.displayName}</h1>
+                <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{`${nodeModel.parsed.id !== node_id ? `${node_id} // ` : ""}  ${nodeModel.parsed.displayName}`}</h1>
                 <div className='space-x-4'>
                     <Link href={`/${node_id}/live-graph`} className="px-8 py-3 border border-black rounded-full no-underline text-black font-bold">
                         Live Graph

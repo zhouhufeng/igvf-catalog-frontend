@@ -1,4 +1,4 @@
-import { RouterInputs, RouterOutputs, api } from "@/lib/utils/api";
+import { api, RouterInputs, RouterOutputs } from "@/lib/utils/api";
 
 export type QueryType = RouterInputs['autocomplete']['type'];
 
@@ -24,6 +24,12 @@ export default class AutocompleteService {
         const results = await Promise.all(promises);
 
         const flattened = results.flat();
+
+        for (const res of flattened) {
+            if (res.uri.includes('/')) {
+                res.uri = res.uri.split('/').pop()!;
+            }
+        }
 
         return flattened;
     }
