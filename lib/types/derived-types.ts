@@ -11,6 +11,7 @@ export type StudyNodeData = NonNullable<Awaited<ReturnType<typeof NodeService.ge
 export type DiseaseNodeData = Omit<RouterOutputs['diseasesFromGenes'][0], 'gene'> & OntologyTerm & { gene?: GeneNodeData };
 
 export type OntologyTerm = RouterOutputs['ontologyTerm'][0];
+export type RegulatoryRegion = RouterOutputs['regulatoryRegions'][0];
 
 export interface GraphNode {
     gene?: GeneNodeData;

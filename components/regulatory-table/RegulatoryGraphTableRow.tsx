@@ -1,44 +1,21 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { flexRender, useReactTable } from "@tanstack/react-table";
 import { useDispatch } from 'react-redux';
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 
-import { setPathChildren, toggleExpandAtPath } from '@/app/_redux/slices/graphSlice';
-import { catalog } from '@/lib/catalog-interface/catalog';
 
 type LoadingStatus = "idle" | "loading" | "loaded" | "error";
 
-export default function CollectionTableRow({
+export default function RegulatoryGraphTableRow({
     row,
-    path
 }: {
     row: ReturnType<ReturnType<typeof useReactTable<any>>['getRowModel']>['rows'][number];
-    path: string[],
 }) {
     const dispatch = useDispatch();
     const [status, setStatus] = useState<LoadingStatus>("idle");
 
     const toggleExpand = async () => {
-        if (row.original.expanded || row.original.populated) return dispatch(toggleExpandAtPath({ path }));
 
-        const id = path[path.length - 1];
-
-        try {
-            setStatus("loading");
-            const model = catalog.node(id);
-            const data = await model.getAdjacent(id);
-
-            if (!data) throw new Error("Couldn't load adjacent nodes");
-
-            const serialized = data.map(n => n.serialize());
-
-            dispatch(toggleExpandAtPath({ path }));
-            dispatch(setPathChildren({ path, data: serialized }));
-            setStatus("loaded");
-        } catch (error) {
-            console.error(error);
-            setStatus("error");
-        }
     }
 
     return (
@@ -47,11 +24,6 @@ export default function CollectionTableRow({
                 if (cell.column.id === 'expand') {
                     return (
                         <td key={cell.id} className="px-2 py-2">
-                            {path.length > 2 ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 absolute -translate-x-10 -translate-y-1">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                                </svg>
-                            ) : null}
                             <DropdownButton
                                 onClick={toggleExpand}
                                 expanded={row.original.expanded}
@@ -108,3 +80,4 @@ function DropdownButton({
         </motion.svg>
     );
 }
+

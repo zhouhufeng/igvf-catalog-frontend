@@ -1,4 +1,4 @@
-import Modal from "@/components/Modal";
+import Modal from "@/components/ui/Modal";
 import NodeEdgesTable from "@/components/node-edges-table/NodeEdgesTable";
 import { NodeType } from "@/lib/types/derived-types";
 

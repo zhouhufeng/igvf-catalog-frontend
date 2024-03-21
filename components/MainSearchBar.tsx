@@ -1,10 +1,10 @@
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { SlashCommandType, addSearchHistoryEntry, deleteAtTimestamp, selectSearchHistory, selectSearchQuery, selectSlashCommand, setSearchQuery, setSlashCommand } from "@/app/_redux/slices/searchSlice";
+import { addSearchHistoryEntry, deleteAtTimestamp, selectSearchHistory, selectSearchQuery, selectSlashCommand, setSearchQuery, setSlashCommand, SlashCommandType } from "@/app/_redux/slices/searchSlice";
 import AutocompleteService, { AutocompleteResp, QueryType } from "@/lib/services/AutocompleteService";
 import { debounce } from "@/lib/utils/utils";
 import classNames from "classnames";
 import { useRouter } from "next13-progressbar";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Skeleton from 'react-loading-skeleton';
 
 function SearchSuggestionDivider({ text }: { text: string }) {
@@ -24,7 +24,7 @@ function SearchSuggestionBase({
 }: {
     icon: React.ReactNode;
     text: string;
-    desc: string;
+    desc: string | number;
     rightAdornment?: React.ReactNode;
     onClick: () => void;
 }) {
@@ -59,17 +59,42 @@ const typeToEmoji: TypeToEmoji = {
     disease: "🩺",
 };
 
-export const exactTypes = {
+export const exactTypes: {
+    [key: string]: {
+        regexList: RegExp[];
+        path?: string;
+        message: string;
+        tip: string;
+        exampleQuery: string;
+    };
+} = {
     "rs": {
-        path: "/rsid",
-        message: "You're entering a variant ID. Enter the full ID then click here to search.",
+        regexList: [/^rs\d+$/i,],
+        message: "You're entering a variant ID. Enter the full ID then click here or press enter.",
+        tip: "Variant Type with rsXXXXX. Ex: rs123",
+        exampleQuery: "rs123",
+    },
+    "chr": {
+        path: "/region",
+        regexList: [/^(chr)?(\d+):(\d+)-(\d+)$/i,],
+        message: "You're entering coordinates. Enter the full coordinate then click here or press enter.",
+        tip: "Region with chrX:XXXX-XXXX or X:XXXX-XXXX. Ex: chr1:1000-20000",
+        exampleQuery: "chr1:1000-20000",
+    },
+    "spdi": {
+        regexList: [/^\d+_\d+_[A-Z]_[A-Z]$/, /NC_\d+\.\d+:\d+:[A-Z]:[A-Z]/],
+        message: "You're entering a SPDI. Enter the full SPDI then click here or press enter.",
+        tip: "SPDI like XX_XXXXXXXX_A_A or NC_XXXXXX.X:XXXXXXX:X:X. Ex: NC_000007.14:24926826:C:A or 17_46935905_T_C",
+        exampleQuery: "17_46935905_T_C",
     }
 }
 
 const getTypeFromQuery = (query: string): keyof typeof exactTypes | null => {
-    for (let prefix of Object.keys(exactTypes)) {
-        if (query.startsWith(prefix)) {
-            return prefix as keyof typeof exactTypes;
+    for (const [prefix, type] of Object.entries(exactTypes)) {
+        for (const regex of type.regexList) {
+            if (regex.test(query)) {
+                return prefix as keyof typeof exactTypes;
+            }
         }
     }
     return null;
@@ -102,11 +127,12 @@ export default function MainSearchBar() {
                     text={`"${searchQuery}"`}
                     desc={exactTypes[exactType].message}
                     onClick={() => {
-                        router.push(`${searchQuery}`);
+                        const uri = exactTypes[exactType].path ? `${exactTypes[exactType].path}/${searchQuery}` : `${searchQuery}`;
+                        router.push(uri);
                         dispatch(addSearchHistoryEntry({
                             result: {
                                 term: searchQuery,
-                                uri: `${exactTypes[exactType].path}/${searchQuery}`,
+                                uri,
                                 type: exactType,
                             },
                             timestamp: Date.now(),
@@ -114,7 +140,7 @@ export default function MainSearchBar() {
                     }}
                     key={`searchResult-${exactType}`}
                 />
-            )   
+            )
         }
         if (resultsStatus === "loading") return (
             <Skeleton count={6} height={26} style={{ marginTop: 18, }} />
@@ -144,7 +170,7 @@ export default function MainSearchBar() {
                         text={result.term}
                         desc={result.type}
                         onClick={() => {
-                            router.push(result.uri.split('/')[2]);
+                            router.push(result.uri);
                             dispatch(addSearchHistoryEntry({
                                 result,
                                 timestamp: Date.now(),
@@ -171,7 +197,7 @@ export default function MainSearchBar() {
                         desc={res.result.type}
                         icon={<div className="text-gray-500 text-sm">{typeToEmoji[res.result.type] || '🔎'}</div>}
                         onClick={() => {
-                            router.push(res.result.uri.split('/')[2]);
+                            router.push(res.result.uri);
                             dispatch(addSearchHistoryEntry({
                                 result: res.result,
                                 timestamp: Date.now(),
@@ -211,7 +237,27 @@ export default function MainSearchBar() {
                     key={`filter-${type}`}
                 />
             );
+
         });
+
+        suggestions.push(
+            <SearchSuggestionDivider text="Exact Types" key="exact-types" />
+        )
+        for (const [prefix, type] of Object.entries(exactTypes)) {
+            suggestions.push(
+                <SearchSuggestionBase
+                    icon={<div className="text-gray-500 text-sm">{typeToEmoji[prefix] || '🔎'}</div>}
+                    text={prefix}
+                    desc={type.tip}
+                    onClick={() => {
+                        setExactType(prefix as keyof typeof exactTypes);
+                        dispatch(setSearchQuery(type.exampleQuery));
+                        textFieldRef.current?.focus();
+                    }}
+                    key={`exactType-${prefix}`}
+                />
+            );
+        }
 
         return suggestions;
     }
@@ -308,6 +354,21 @@ export default function MainSearchBar() {
                         onKeyDown={(e) => {
                             if (e.key === "Backspace" && searchQuery.length === 0) {
                                 dispatch(setSlashCommand(null));
+                            }
+                            if (e.key === "Enter" && searchQuery.length > 0 && focused) {
+                                const suggestions = renderSearchSuggestions();
+
+                                if (Array.isArray(suggestions)) {
+                                    console.log(suggestions);
+                                    for (const suggestion of suggestions) {
+                                        if (React.isValidElement(suggestion) && suggestion.props.onClick) {
+                                            suggestion.props.onClick();
+                                            break;
+                                        }
+                                    }
+                                } else if (React.isValidElement(suggestions) && (suggestions.props as any).onClick) {
+                                    (suggestions.props as any).onClick();
+                                }
                             }
                         }}
                         onChange={(e) => {

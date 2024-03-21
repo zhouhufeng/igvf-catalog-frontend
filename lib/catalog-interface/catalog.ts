@@ -6,7 +6,16 @@ import BaseNode from "./model/_BaseNode";
 
 class Catalog {
     node(id: string) {
-        const model = prefixes.find(p => id.toUpperCase().startsWith(p.prefix.toUpperCase()));
+        id = decodeURIComponent(id);
+        const model = prefixes.find(p => {
+            if ('prefix' in p) {
+                return id.startsWith(p.prefix);
+            }
+            if ('regex' in p) {
+                return p.regex.test(id);
+            }
+            return false;
+        });
 
         if (!model) throw new Error(`No model found for id ${id}. Add a model in prefix-to-model.ts`);
 

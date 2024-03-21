@@ -12,7 +12,7 @@ import {
 } from "@tanstack/react-table"
 import { useEffect, useMemo, useState } from "react";
 import Papa from 'papaparse';
-import LoadingSpinner from "../LoadingSpinner";
+import LoadingSpinner from "../ui/LoadingSpinner";
 import './table.css'
 import classNames from "classnames";
 

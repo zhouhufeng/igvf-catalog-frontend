@@ -4,10 +4,13 @@ import Loading from "@/app/[node_id]/loading";
 import { useAppSelector } from "@/app/_redux/hooks";
 import { selectColors, selectLiveGraphSettings } from "@/app/_redux/slices/settingsSlice";
 import GraphTraverser from "@/lib/catalog-interface/GraphTraverser";
+import { catalog } from "@/lib/catalog-interface/catalog";
 import { GraphNode } from "@/lib/types/derived-types";
 import { LiveGraphData } from "@/lib/types/live-graph-types";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { GraphCanvas } from "reagraph";
+import { GraphCanvas, InternalGraphNode } from "reagraph";
 
 enum LoadingStatus {
     Loading,
@@ -20,32 +23,25 @@ export default function LiveGraph({
 }: {
     startNode: GraphNode;
 }) {
+    const router = useRouter();
     const colors = useAppSelector(selectColors);
     const traverser = useMemo(() => new GraphTraverser(), []);
-    const [data, setData] = useState<LiveGraphData | null>(null);
-    const [status, setStatus] = useState(LoadingStatus.Loading);
+    // const [data, setData] = useState<LiveGraphData | null>(null);
+    // const [status, setStatus] = useState(LoadingStatus.Loading);
 
     const _settings = useAppSelector(selectLiveGraphSettings);
     const [settings, setSettings] = useState(_settings);
     const [pendingSettingsChange, setPendingSettingsChange] = useState(false);
 
-    useEffect(() => {
-        // setData(testData);
-        // setStatus(LoadingStatus.Loaded);
-        // return;
-        setStatus(LoadingStatus.Loading);
-        traverser
-            .fetchGraphToDepth(startNode, settings, colors)
-            .then(res => {
-                setData(res);
-                setStatus(LoadingStatus.Loaded);
-            })
-            .catch(e => {
-                console.error(e);
-                setStatus(LoadingStatus.Error);
-            });
-    }, [settings]);
-
+    const { data, isError, isPending } = useQuery({
+        queryKey: ['live-graph', catalog.deserialize(startNode).parsed.id],
+        queryFn: ({ signal }) => traverser.fetchGraphToDepth({
+            startNode,
+            settings,
+            colors,
+            signal
+        }),
+    });
 
     useEffect(() => {
         if (JSON.stringify(settings) !== JSON.stringify(_settings)) {
@@ -62,8 +58,12 @@ export default function LiveGraph({
         setPendingSettingsChange(false);
     };
 
-    if (status === LoadingStatus.Error) return (
-        <div className="flex flex-col items-center justify-center h-[80vh]">
+    const handleNodeClick = (node: InternalGraphNode) => {
+        router.push(`/${node.data.id}/live-graph`);
+    }
+
+    if (isError) return (
+        <div className="flex flex-col items-center justify-center h-[80vh] animate-in fade-in duration-300">
             <div className="flex flex-col items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-12 h-12 m-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
@@ -74,8 +74,8 @@ export default function LiveGraph({
         </div>
     )
 
-    if (!data || status !== LoadingStatus.Loaded) return (
-        <div className="flex flex-col items-center justify-center h-[80vh]">
+    if (!data || isPending) return (
+        <div className="flex flex-col items-center justify-center h-[80vh] animate-in fade-in duration-300">
             <div className="flex flex-col items-center">
                 <Loading />
                 <h1 className="text-2xl font-bold">Reconstructing the graph from scratch for you. Hang tight...</h1>
@@ -87,7 +87,7 @@ export default function LiveGraph({
     return (
         <>
             {pendingSettingsChange ? (
-                <div className="absolute w-screen z-10 px-6 py-3 flex flex-row items-center justify-between border-t border-b border-gray-500 opacity-0 animate-fadeIn bg-white">
+                <div className="absolute w-screen z-10 px-6 py-3 flex flex-row items-center justify-between border-t border-b border-gray-500 bg-white">
                     <h2 className="text-lg">You have pending settings changes.</h2>
                     <button
                         onClick={handleUpdateSettings}
@@ -99,6 +99,9 @@ export default function LiveGraph({
                 key={JSON.stringify(settings)}
                 nodes={data.nodes}
                 edges={data.edges}
+                sizingType={settings.sizingType}
+                clusterAttribute={settings.clusterStrategy === "unclustered" ? undefined : settings.clusterStrategy}
+                onNodeClick={handleNodeClick}
             />
         </>
     );

@@ -4,14 +4,21 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
 import { RootState } from "../store";
+import { SizingType } from "reagraph";
 
 export type ColorMapType = {
     [key in NodeType]: string;
 };
 
-export interface LiveGraphSettings {
-    loadDepth: number;
-}
+export type ClusterStrategy = "unclustered" | "rootNode" | "density";
+
+const liveGraph = {
+    loadDepth: 2,
+    clusterStrategy: "unclustered" as ClusterStrategy,
+    sizingType: "centrality" as SizingType,
+};
+
+export type LiveGraphSettings = typeof liveGraph;
 
 export const BASE_THICKNESS = 10;
 
@@ -21,9 +28,8 @@ const settingsSlice = createSlice({
         colorMap: {} as ColorMapType,
         dashedTypes: [] as NodeType[],
         edgeThickness: BASE_THICKNESS,
-        liveGraph: {
-            loadDepth: 2,
-        } as LiveGraphSettings
+        liveGraph,
+        graphPageSize: 10,
     },
     reducers: {
         setColors: (state, action: PayloadAction<ColorMapType>) => {
@@ -45,16 +51,20 @@ const settingsSlice = createSlice({
                 ...state.liveGraph,
                 ...action.payload,
             };
+        },
+        setGraphPageSize: (state, action: PayloadAction<number>) => {
+            state.graphPageSize = action.payload;
         }
     }
 });
 
-export const { setColors, addDashedType, removeDashedType, setEdgeThickness, setLiveGraphSettings } = settingsSlice.actions;
+export const { setColors, addDashedType, removeDashedType, setEdgeThickness, setLiveGraphSettings, setGraphPageSize } = settingsSlice.actions;
 
 export const selectColors = (state: RootState) => state.settings.colorMap;
 export const selectDashedTypes = (state: RootState) => state.settings.dashedTypes;
 export const selectEdgeThickness = (state: RootState) => state.settings.edgeThickness;
 export const selectLiveGraphSettings = (state: RootState) => state.settings.liveGraph;
+export const selectGraphPageSize = (state: RootState) => state.settings.graphPageSize;
 
 const settingsReducer = settingsSlice.reducer;
 

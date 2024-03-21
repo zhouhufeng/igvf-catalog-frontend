@@ -1,5 +1,6 @@
 import { GraphNode } from "@/lib/types/derived-types";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
+import { ColumnDef } from "@tanstack/react-table";
 
 export default class BaseNode {
     data: any;
@@ -27,6 +28,18 @@ export default class BaseNode {
     }
 
     static async getAdjacent(id: string, options?: GetAdjacentOptions): Promise<BaseNode[] | null> {
+        throw new Error("Not implemented");
+    }
+
+    static async query({
+        region,
+    }: {
+        region: string;
+    }): Promise<BaseNode[] | null> {
+        return [];
+    }
+
+    static getTableColumns(): ColumnDef<any, any>[] {
         throw new Error("Not implemented");
     }
 

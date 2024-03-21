@@ -58,4 +58,14 @@ export default class TranscriptNode extends BaseNode {
             return null;
         }
     }
+
+    static async query({
+        region
+    }: {
+        region: string;
+    }) {
+        const transcripts = await api.transcripts.query({ region }).then(v => (v as any[]).map(n => ({ transcript: n })));
+
+        return transcripts.map(catalog.deserialize);
+    }
 }

@@ -6,28 +6,38 @@ import { catalog } from "./catalog";
 import BaseNode from "./model/_BaseNode";
 
 export default class GraphTraverser {
-    adjacentCache = new Map<string, Awaited<ReturnType<typeof BaseNode.getAdjacent>>>();
-    rawNodesAndEdgesResponse = new Map<string, { nodes: GraphNode[], edges: GraphEdge[] }>();
+    static adjacentCache = new Map<string, Awaited<ReturnType<typeof BaseNode.getAdjacent>>>();
+    static rawNodesAndEdgesResponse = new Map<string, { nodes: GraphNode[], edges: GraphEdge[] }>();
 
     async getNodeAdjacent(node: GraphNode, model: BaseNode) {
         const adjacent = await catalog.deserializeToStatic(node).getAdjacent(model.parsed.id);
 
-        if (this.adjacentCache.has(model.parsed.id)) {
-            return this.adjacentCache.get(model.parsed.id)!;
+        if (GraphTraverser.adjacentCache.has(model.parsed.id)) {
+            return GraphTraverser.adjacentCache.get(model.parsed.id)!;
         } else {
-            this.adjacentCache.set(model.parsed.id, adjacent);
+            GraphTraverser.adjacentCache.set(model.parsed.id, adjacent);
         }
 
         return adjacent;
     }
 
-    async fetchGraphToDepth(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
+    async fetchGraphToDepth({
+        startNode,
+        settings,
+        colors,
+        signal,
+    }: {
+        startNode: GraphNode;
+        settings: LiveGraphSettings;
+        colors: ColorMapType;
+        signal?: AbortSignal;
+    }) {
         const startModel = catalog.deserialize(startNode);
         const cacheKey = startModel.parsed.id + "-" + settings.loadDepth;
 
-        if (this.rawNodesAndEdgesResponse.has(cacheKey)) {
-            const { nodes, edges } = this.rawNodesAndEdgesResponse.get(cacheKey)!;
-            return GraphTraverser.mapToRegraphFormat(nodes, edges, colors);
+        if (GraphTraverser.rawNodesAndEdgesResponse.has(cacheKey)) {
+            const { nodes, edges } = GraphTraverser.rawNodesAndEdgesResponse.get(cacheKey)!;
+            return GraphTraverser.mapToRegraphFormat(nodes, edges, colors, settings);
         }
         const nodes: GraphNode[] = [];
         const edges: GraphEdge[] = [];
@@ -45,6 +55,8 @@ export default class GraphTraverser {
         visited.add(startModel.parsed.id);
 
         while (queue.length > 0) {
+            if (signal?.aborted) throw new Error("Cancellation Requested");
+
             const { node, depth: nodeDepth } = queue.shift()!;
             const model = catalog.deserialize(node);
             if (!nodes.some(n => catalog.deserialize(n).parsed.id === model.parsed.id)) {
@@ -70,25 +82,29 @@ export default class GraphTraverser {
             }
         }
 
-        this.rawNodesAndEdgesResponse.set(cacheKey, { nodes, edges });
+        GraphTraverser.rawNodesAndEdgesResponse.set(cacheKey, { nodes, edges });
 
-        return GraphTraverser.mapToRegraphFormat(nodes, edges, colors);
+        return GraphTraverser.mapToRegraphFormat(nodes, edges, colors, settings);
     }
 
     async getStoredRawGraph(startNode: GraphNode, settings: LiveGraphSettings, colors: ColorMapType) {
-        return this.fetchGraphToDepth(startNode, settings, colors);
+        return this.fetchGraphToDepth({
+            startNode,
+            settings,
+            colors
+        });
     }
 
     responseIsCached(startNode: GraphNode, settings: LiveGraphSettings) {
         const startModel = catalog.deserialize(startNode);
-        return this.rawNodesAndEdgesResponse.has(GraphTraverser.getCacheKey(startModel, settings));
+        return GraphTraverser.rawNodesAndEdgesResponse.has(GraphTraverser.getCacheKey(startModel, settings));
     }
 
     static getCacheKey(startModel: BaseNode, settings: LiveGraphSettings) {
         return `${startModel.parsed.id}-${settings.loadDepth}`;
     }
 
-    static mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[], colors: ColorMapType) {
+    static mapToRegraphFormat(nodes: GraphNode[], edges: GraphEdge[], colors: ColorMapType, settings: LiveGraphSettings) {
         let edgesSet = new Set<string>();
 
         const mappedEdges = edges.map<LiveGraphData['edges'][0]>(e => ({
@@ -96,6 +112,24 @@ export default class GraphTraverser {
             target: e.target,
             id: `${e.source}-${e.target}`,
         }));
+
+        const targetConnections = new Map<string, number>();
+        mappedEdges.forEach(edge => {
+            const target = edge.target;
+            if (targetConnections.has(target)) {
+                targetConnections.set(target, targetConnections.get(target)! + 1);
+            } else {
+                targetConnections.set(target, 1);
+            }
+        });
+
+        const denseTargets = new Set<string>();
+
+        const sortedTargets = Array.from(targetConnections.entries()).sort((a, b) => b[1] - a[1]);
+
+        for (let i = 0; i < Math.min(7, sortedTargets.length); i++) {
+            denseTargets.add(sortedTargets[i][0]);
+        }
 
         const dedupedEdges = mappedEdges.filter(e => {
             if (edgesSet.has(e.id)) {
@@ -113,6 +147,10 @@ export default class GraphTraverser {
                     id: model.parsed.id,
                     label: model.parsed.displayName,
                     fill: colors[catalog.modelToKey(model)] ?? undefined,
+                    data: {
+                        rootNode: catalog.modelToKey(model),
+                        density: denseTargets.has(model.parsed.id) ? "dense" : "sparse",
+                    },
                 }
             }),
             edges: dedupedEdges

@@ -1,11 +1,12 @@
-import { GeneNodeData, GraphNode, NodeType, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
+import BaseNode from "./_BaseNode";
+import { GeneNodeData, GraphNode, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
 import { single } from "@/lib/utils/utils";
 
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
-import BaseNode from "./_BaseNode";
+import { createColumnHelper } from "@tanstack/react-table";
 
 export default class GeneNode extends BaseNode {
     data: GeneNodeData;
@@ -59,5 +60,23 @@ export default class GeneNode extends BaseNode {
             console.error(error);
             return null;
         }
+    }
+
+    static async query({
+        region
+    }: {
+        region: string;
+    }) {
+        const genes = await api.genes.query({ region }).then(v => (v as any[]).map(n => ({ gene: n })));
+
+        return genes.map(catalog.deserialize);
+    }
+
+    static getTableColumns() {
+        const columnHelper = createColumnHelper<GeneNodeData>();
+
+        return [
+
+        ]
     }
 }

@@ -3,7 +3,7 @@ import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
 import { selectSorting, setSorting } from "@/app/_redux/slices/querySlice";
 import { catalog } from "@/lib/catalog-interface/catalog";
 import { NodeType } from "@/lib/types/derived-types";
-import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, OnChangeFn, SortingState, Updater, useReactTable } from "@tanstack/react-table";
+import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, OnChangeFn, SortingState, useReactTable } from "@tanstack/react-table";
 import classNames from "classnames";
 import { useMemo } from "react";
 
@@ -105,7 +105,7 @@ export default function InternalCollectionTable({
                                         whiteSpace: "nowrap",
                                         overflow: "hidden",
                                     }}
-                                    className="px-2 py-3 cursor-pointer"
+                                    className="px-2 py-2 cursor-pointer"
                                 >
                                     <div
                                         className={classNames(
