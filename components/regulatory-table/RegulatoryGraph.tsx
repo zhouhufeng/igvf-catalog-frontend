@@ -2,7 +2,6 @@
 
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { selectSorting, setSorting } from "@/app/_redux/slices/querySlice";
-import { catalog } from "@/lib/catalog-interface/catalog";
 import { createColumnHelper, flexRender, getCoreRowModel, getSortedRowModel, OnChangeFn, SortingState, useReactTable } from "@tanstack/react-table";
 import classNames from "classnames";
 import { useEffect, useMemo, useState } from "react";
@@ -17,7 +16,7 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import { selectGraphPageSize, setGraphPageSize } from "@/app/_redux/slices/settingsSlice";
 import Link from "next/link";
 
@@ -37,7 +36,6 @@ export default function RegulatoryGraph({
 
     const [pageIndex, setPageIndex] = useState(0);
     const [hasNext, setHasNext] = useState(true);
-
 
     const fetchNextPage = async () => {
         const region = new GenomicRegion(stateKey);
