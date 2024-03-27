@@ -110,21 +110,15 @@ export default function RegulatoryGraph({
                 }),
                 columnHelper.accessor('biochemical_activity', {
                     header: () => <span>Biochemical Activity</span>,
-                    cell: ({ row: { original } }) => {
-                        return original.biochemical_activity;
-                    }
                 }),
                 columnHelper.accessor('biochemical_activity_description', {
-                    header: () => <span>Biochemical Activity Description</span>,
-                    cell: (cell) => cell.getValue()
+                    header: () => <span>Biochemical Activity Description</span>
                 }),
                 columnHelper.accessor('type', {
-                    header: () => <span>Type</span>,
-                    cell: (cell) => cell.getValue()
+                    header: () => <span>Type</span>
                 }),
                 columnHelper.accessor('source', {
-                    header: () => <span>Source</span>,
-                    cell: (cell) => cell.getValue()
+                    header: () => <span>Source</span>
                 }),
                 columnHelper.accessor('source_url', {
                     header: () => <span>Source URL</span>,

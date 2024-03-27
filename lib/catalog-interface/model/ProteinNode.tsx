@@ -1,6 +1,7 @@
 import { GraphNode, ProteinNodeData, TranscriptNodeData } from "@/lib/types/derived-types";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
+import { createColumnHelper } from "@tanstack/react-table";
 
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
@@ -55,5 +56,29 @@ export default class ProteinNode extends BaseNode {
             console.error(error);
             return null;
         }
+    }
+
+    static getTableColumns() {
+        const columnHelper = createColumnHelper<ProteinNodeData & { [key: string]: any; }>();
+
+        return [
+            columnHelper.accessor('_id', {
+                header: () => <span>Protein ID</span>
+            }),
+            columnHelper.accessor('name', {
+                header: () => <span>Protein Name</span>
+            }),
+            columnHelper.accessor('full_name', {
+                header: () => <span>Full Name</span>
+            }),
+            columnHelper.accessor('source', {
+                header: () => <span>Source</span>,
+                cell: ({ row: { original } }) =>
+                    (original.source && original.source_url) ? (
+                        <a href={original.source_url} target="_blank" className="underline text-brand">{original.source}</a>
+                    ) : original.source ?? "---"
+            }),
+            // TODO: allow dbxrefs access
+        ]
     }
 }

@@ -1,6 +1,6 @@
 import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
 import { catalog } from "@/lib/catalog-interface/catalog";
-import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
+import { TableNodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 
 import GraphContainer from "./GraphContainer";
 import InternalCollectionTable from "./InternalCollectionTable";
@@ -14,7 +14,7 @@ export default function NodeCollection({
     parentPath,
     location,
 }: {
-    group: NodeTypeGroup;
+    group: TableNodeTypeGroup;
     parentPath: string[];
     location?: MainGraphLocation;
 }) {

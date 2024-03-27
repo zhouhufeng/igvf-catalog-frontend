@@ -1,3 +1,4 @@
+import NodeTable from '@/components/core-table/NodeTable';
 import ExpandedNode from '@/components/ExpandedNode';
 import FilterDisplay from '@/components/filters/FilterDisplay';
 import GraphContainer from '@/components/main-graph/GraphContainer';
@@ -19,23 +20,16 @@ export default async function Page({
     const node_id = decodeURIComponent(_node_id);
     const model = catalog.node(node_id);
     const nodeModel = await model?.get(node_id);
-    const edges = await model?.getAdjacent(node_id);
 
-    if (!nodeModel || !edges) {
+    if (!nodeModel) {
         notFound();
     }
 
     const serializedBaseNode = nodeModel.serialize();
-    const serializedEdges = edges.map(e => e.serialize());
-    const graphKey = nodeModel.parsed.id;
 
     return (
         <div className="px-6 animate-in fade-in duration-300">
             <SetNavigation title={nodeModel.parsed.id} />
-            <GraphHydrator
-                graphKey={graphKey}
-                serializedEdges={serializedEdges}
-            />
             <div className='my-3 flex flex-row justify-between'>
                 <h1 className='text-3xl font-bold text-gray-600 line-clamp-1'>{`${nodeModel.parsed.id !== node_id ? `${node_id} // ` : ""}  ${nodeModel.parsed.displayName}`}</h1>
                 <div className='space-x-4'>
@@ -50,10 +44,7 @@ export default async function Page({
                     <ExpandedNode node={serializedBaseNode} />
                 </div>
                 <div className="pl-4 -mt-4">
-                    <GraphContainer
-                        path={[graphKey]}
-                        initialEdges={serializedEdges}
-                    />
+                    <NodeTable node_id={node_id} />
                 </div>
             </div>
         </div>

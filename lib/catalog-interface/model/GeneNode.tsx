@@ -1,12 +1,13 @@
-import BaseNode from "./_BaseNode";
 import { GeneNodeData, GraphNode, OntologyTerm, TranscriptNodeData } from "@/lib/types/derived-types";
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
 import { single } from "@/lib/utils/utils";
+import { createColumnHelper } from "@tanstack/react-table";
+import Link from "next/link";
 
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
-import { createColumnHelper } from "@tanstack/react-table";
+import BaseNode from "./_BaseNode";
 
 export default class GeneNode extends BaseNode {
     data: GeneNodeData;
@@ -73,10 +74,42 @@ export default class GeneNode extends BaseNode {
     }
 
     static getTableColumns() {
-        const columnHelper = createColumnHelper<GeneNodeData>();
+        const columnHelper = createColumnHelper<GeneNodeData & { [key: string]: any; }>();
 
         return [
-
+            columnHelper.accessor('region', {
+                header: () => <span>Region</span>,
+                cell: ({ row: { original } }) => {
+                    const converted = `${original.chr}:${original.start}-${original.end}`;
+                    return <Link href={`/region/${converted}`} className="underline text-brand">
+                        {converted}
+                    </Link>
+                }
+            }),
+            columnHelper.accessor('gene_name', {
+                header: () => <span>Name</span>
+            }),
+            columnHelper.accessor("gene_type", {
+                header: () => <span>Type</span>
+            }),
+            columnHelper.accessor("hgnc", {
+                header: () => <span>HGNC</span>,
+                cell: ({ row: { original } }) => original.hgnc?.split(":")[1]
+            }),
+            columnHelper.accessor("source", {
+                header: () => <span>Source</span>,
+                cell: ({ row: { original } }) =>
+                    original.source_url ? (
+                        <a href={original.source_url} target="_blank" className="underline text-brand">{original.source}</a>
+                    ) : original.source
+            }),
+            columnHelper.accessor("version", {
+                header: () => <span>Version</span>,
+            }),
+            columnHelper.accessor("alias", {
+                header: () => <span>Aliases</span>,
+                cell: ({ row: { original } }) => original.alias?.join(", ") ?? "---"
+            }),
         ]
     }
 }

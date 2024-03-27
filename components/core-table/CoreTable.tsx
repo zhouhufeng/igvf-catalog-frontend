@@ -7,7 +7,6 @@ import { ColumnDef, Row, flexRender, getCoreRowModel, getSortedRowModel, useReac
 import { useEffect, useMemo, useState } from "react";
 import { CoreTableStateData } from "./core-table-types";
 import NodeTable from "./NodeTable";
-import classNames from "classnames";
 import SplitTableSection from "./SplitTableSection";
 
 const SERVER_PAGE_SIZE = 25;
@@ -15,16 +14,18 @@ const SERVER_PAGE_SIZE = 25;
 export default function CoreTable<T>({
     fetchNextPage,
     columns,
+    initialData,
     depth,
 }: {
     fetchNextPage: (page: number) => Promise<CoreTableStateData<T>[]>;
     columns: ColumnDef<CoreTableStateData<T>, any>[];
+    initialData?: CoreTableStateData<T>[];
     depth: number;
 }) {
     const filters = useAppSelector(selectFilters);
     const pageSize = useAppSelector(selectGraphPageSize);
 
-    const [data, setData] = useState<CoreTableStateData<T>[]>([]);
+    const [data, setData] = useState<CoreTableStateData<T>[]>(initialData ?? []);
 
     const [pageIndex, setPageIndex] = useState(0);
     const [hasNext, setHasNext] = useState(true);
