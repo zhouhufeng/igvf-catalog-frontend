@@ -1,13 +1,15 @@
 "use client";
 
-import { useAppSelector } from "@/app/_redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { selectFilters } from "@/app/_redux/slices/querySlice";
-import { selectGraphPageSize } from "@/app/_redux/slices/settingsSlice";
+import { selectGraphPageSize, setGraphPageSize } from "@/app/_redux/slices/settingsSlice";
 import { ColumnDef, Row, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import { CoreTableStateData } from "./core-table-types";
 import NodeTable from "./NodeTable";
 import SplitTableSection from "./SplitTableSection";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select";
+import { Button } from "../ui/button";
 
 const SERVER_PAGE_SIZE = 25;
 
@@ -17,11 +19,12 @@ export default function CoreTable<T>({
     initialData,
     depth,
 }: {
-    fetchNextPage: (page: number) => Promise<CoreTableStateData<T>[]>;
+    fetchNextPage: (page?: number) => Promise<CoreTableStateData<T>[]>;
     columns: ColumnDef<CoreTableStateData<T>, any>[];
     initialData?: CoreTableStateData<T>[];
     depth: number;
 }) {
+    const dispatch = useAppDispatch();
     const filters = useAppSelector(selectFilters);
     const pageSize = useAppSelector(selectGraphPageSize);
 
@@ -32,12 +35,17 @@ export default function CoreTable<T>({
 
     useEffect(() => {
         (async () => {
-            if ((pageIndex + 1) * pageSize >= data.length) {
+            if (data.length === 0) {
+                const newData = await fetchNextPage();
+                setData(newData);
+            } else if ((pageIndex + 1) * pageSize >= data.length) {
                 const nextPageNumber = Math.floor(data.length / SERVER_PAGE_SIZE) + 1;
 
                 const newData = await fetchNextPage(nextPageNumber);
+                
                 if (newData && newData.length > 0) {
-                    setData([...data, ...newData]);
+                    setData(curData => [...curData, ...newData]);
+                    setHasNext(true);
                 } else {
                     setHasNext(false);
                 }
@@ -45,8 +53,14 @@ export default function CoreTable<T>({
         })();
     }, [pageIndex, pageSize, data.length]);
 
+    const currentPageData = useMemo(() => {
+        const start = pageIndex * pageSize;
+        const end = start + pageSize;
+        return data.slice(start, end);
+    }, [data, pageIndex, pageSize]);
+
     const table = useReactTable<CoreTableStateData<T>>({
-        data,
+        data: currentPageData,
         columns,
         // state: {
         //     sorting
@@ -119,6 +133,25 @@ export default function CoreTable<T>({
     return (
         <div className="pl-1">
             {contents.elements}
+            <div className="flex flex-row items-center justify-center space-x-4">
+                <Select value={pageSize.toString()} onValueChange={(v) => dispatch(setGraphPageSize(parseInt(v)))}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="25" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="10">10</SelectItem>
+                        <SelectItem value="25">25</SelectItem>
+                        <SelectItem value="50">50</SelectItem>
+                        <SelectItem value="100">100</SelectItem>
+                    </SelectContent>
+                </Select>
+                <Button onClick={() => setPageIndex(old => Math.max(old - 1, 0))} disabled={pageIndex === 0}>Previous</Button>
+                <div className="flex flex-row items-center space-x-4">
+                    <p className="whitespace-nowrap">Page {pageIndex + 1}</p>
+                </div>
+                <Button onClick={() => setPageIndex(old => old + 1)} disabled={(pageIndex + 1) * pageSize >= data.length}>Next</Button>
+            </div>
+            {!hasNext && <p className="absolute right-0 -bottom-[25px] text-sm text-slate-600">You've reached the end.</p>}
         </div>
     )
 }
