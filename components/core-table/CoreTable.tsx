@@ -3,24 +3,28 @@
 import { useAppDispatch, useAppSelector } from "@/app/_redux/hooks";
 import { selectFilters } from "@/app/_redux/slices/querySlice";
 import { selectGraphPageSize, setGraphPageSize } from "@/app/_redux/slices/settingsSlice";
-import { ColumnDef, Row, flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { ColumnDef, Row, getCoreRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import { CoreTableStateData } from "./core-table-types";
 import NodeTable from "./NodeTable";
 import SplitTableSection from "./SplitTableSection";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select";
 import { Button } from "../ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { NodeType } from "@/lib/types/derived-types";
+import { checkFiltersOnNode } from "@/lib/catalog-interface/helpers/apply-filter";
 
 const SERVER_PAGE_SIZE = 25;
 
 export default function CoreTable<T>({
     fetchNextPage,
     columns,
+    filterNodeType,
     initialData,
     depth,
 }: {
     fetchNextPage: (page?: number) => Promise<CoreTableStateData<T>[]>;
     columns: ColumnDef<CoreTableStateData<T>, any>[];
+    filterNodeType?: NodeType;
     initialData?: CoreTableStateData<T>[];
     depth: number;
 }) {
@@ -42,7 +46,7 @@ export default function CoreTable<T>({
                 const nextPageNumber = Math.floor(data.length / SERVER_PAGE_SIZE) + 1;
 
                 const newData = await fetchNextPage(nextPageNumber);
-                
+
                 if (newData && newData.length > 0) {
                     setData(curData => [...curData, ...newData]);
                     setHasNext(true);
@@ -53,10 +57,18 @@ export default function CoreTable<T>({
         })();
     }, [pageIndex, pageSize, data.length]);
 
+    useEffect(() => {
+        setPageIndex(0);
+    }, [pageSize]);
+
     const currentPageData = useMemo(() => {
         const start = pageIndex * pageSize;
         const end = start + pageSize;
-        return data.slice(start, end);
+        const first = data.slice(start, end);
+        if (filterNodeType) {
+            return first.filter(d => checkFiltersOnNode({ [filterNodeType]: d }, filters));
+        }
+        return first;
     }, [data, pageIndex, pageSize]);
 
     const table = useReactTable<CoreTableStateData<T>>({
@@ -79,7 +91,6 @@ export default function CoreTable<T>({
         let count = 0;
 
         for (const el of rows.rows) {
-            // if (!checkFiltersOnNode(node, filters)) continue;
             count++;
 
             curRun.push(el);
@@ -132,26 +143,33 @@ export default function CoreTable<T>({
 
     return (
         <div className="pl-1">
-            {contents.elements}
-            <div className="flex flex-row items-center justify-center space-x-4">
-                <Select value={pageSize.toString()} onValueChange={(v) => dispatch(setGraphPageSize(parseInt(v)))}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="25" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="10">10</SelectItem>
-                        <SelectItem value="25">25</SelectItem>
-                        <SelectItem value="50">50</SelectItem>
-                        <SelectItem value="100">100</SelectItem>
-                    </SelectContent>
-                </Select>
-                <Button onClick={() => setPageIndex(old => Math.max(old - 1, 0))} disabled={pageIndex === 0}>Previous</Button>
-                <div className="flex flex-row items-center space-x-4">
-                    <p className="whitespace-nowrap">Page {pageIndex + 1}</p>
-                </div>
-                <Button onClick={() => setPageIndex(old => old + 1)} disabled={(pageIndex + 1) * pageSize >= data.length}>Next</Button>
+            <div>
+                {contents.elements}
             </div>
-            {!hasNext && <p className="absolute right-0 -bottom-[25px] text-sm text-slate-600">You've reached the end.</p>}
+            <div className="flex flex-row items-center justify-between py-4 w-full max-w-[60vw]">
+                <div></div>
+                <div className="relative">
+                    <div className="flex flex-row items-center justify-center space-x-4">
+                        <Select value={pageSize.toString()} onValueChange={(v) => dispatch(setGraphPageSize(parseInt(v)))}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="25" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="10">10</SelectItem>
+                                <SelectItem value="25">25</SelectItem>
+                                <SelectItem value="50">50</SelectItem>
+                                <SelectItem value="100">100</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Button onClick={() => setPageIndex(old => Math.max(old - 1, 0))} disabled={pageIndex === 0}>Previous</Button>
+                        <div className="flex flex-row items-center space-x-4">
+                            <p className="whitespace-nowrap">Page {pageIndex + 1}</p>
+                        </div>
+                        <Button onClick={() => setPageIndex(old => old + 1)} disabled={(pageIndex + 1) * pageSize >= data.length}>Next</Button>
+                    </div>
+                    {!hasNext && <p className="absolute right-0 -bottom-[25px] text-sm text-slate-600">You've reached the end.</p>}
+                </div>
+            </div>
         </div>
     )
 }

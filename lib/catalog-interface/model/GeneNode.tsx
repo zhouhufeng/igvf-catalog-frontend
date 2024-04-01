@@ -80,14 +80,16 @@ export default class GeneNode extends BaseNode {
             columnHelper.accessor('region', {
                 header: () => <span>Region</span>,
                 cell: ({ row: { original } }) => {
-                    const converted = `${original.chr}:${original.start}-${original.end}`;
+                    const start = original.start || original['start:long'];
+                    const end = original.end || original['end:long'];
+                    const converted = `${original.chr}:${start}-${end}`;
                     return <Link href={`/region/${converted}`} className="underline text-brand">
                         {converted}
                     </Link>
                 }
             }),
             columnHelper.accessor('gene_name', {
-                header: () => <span>Name</span>
+                header: () => <span>Name</span>,
             }),
             columnHelper.accessor("gene_type", {
                 header: () => <span>Type</span>

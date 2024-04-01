@@ -8,6 +8,7 @@ import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
 import BaseNode from "./_BaseNode";
 import GeneNode from "./GeneNode";
+import Link from "next/link";
 
 export default class DiseaseNode extends BaseNode {
     data: DiseaseNodeData;
@@ -82,21 +83,8 @@ export default class DiseaseNode extends BaseNode {
         const columnHelper = createColumnHelper<DiseaseNodeData & { [key: string]: any; }>();
 
         return [
-            columnHelper.accessor("pmid", {
-                header: () => <span>PMID</span>,
-                cell: ({ row: { original } }) => original.pmid?.join(", ") ?? "---"
-            }),
             columnHelper.accessor("term_name", {
                 header: () => <span>Disease Name</span>,
-            }),
-            columnHelper.accessor("gene_symbol", {
-                header: () => <span>Gene Name</span>,
-            }),
-            columnHelper.accessor("association_type", {
-                header: () => <span>Association Type</span>,
-            }),
-            columnHelper.accessor("association_status", {
-                header: () => <span>Association Status</span>,
             }),
             columnHelper.accessor("ontology term", {
                 header: () => <span>Ontology Term</span>,
@@ -112,6 +100,32 @@ export default class DiseaseNode extends BaseNode {
                     }
                 }
             }),
+            columnHelper.accessor("pmid", {
+                header: () => <span>PMID</span>,
+                cell: ({ row: { original } }) => 
+                    original.pmid ? (
+                        original.pmid.map((id, idx) => (
+                            <Link target="_blank" href={`https://pubmed.ncbi.nlm.nih.gov/${id}/`} className="underline text-brand">
+                                {id + (idx !== original.pmid!.length - 1 ? ", " : "")}
+                            </Link>
+                        ))
+                    ) : "---"
+            }),
+
+            columnHelper.accessor("gene_symbol", {
+                header: () => <span>Gene Name</span>,
+                cell: (cell) =>
+                    <Link href={"/" + cell.getValue()} className="underline text-brand">
+                        {cell.getValue()}
+                    </Link>
+            }),
+            columnHelper.accessor("association_type", {
+                header: () => <span>Association Type</span>,
+            }),
+            columnHelper.accessor("association_status", {
+                header: () => <span>Association Status</span>,
+            }),
+
             columnHelper.accessor("source", {
                 header: () => <span>Source</span>,
                 cell: ({ row: { original } }) =>

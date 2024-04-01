@@ -91,7 +91,14 @@ export default class VariantNode extends BaseNode {
             }),
             columnHelper.accessor('rsid', {
                 header: () => <span>rsID</span>,
-                cell: ({ row: { original } }) => original.rsid?.join(", ") ?? "---"
+                cell: ({ row: { original } }) =>
+                    original.rsid ? (
+                        original.rsid.map((id, idx) => (
+                            <Link href={"/" + id} className="underline text-brand">
+                                {id + (idx !== original.rsid!.length - 1 ? ", " : "")}
+                            </Link>
+                        ))
+                    ) : "---"
             }),
             columnHelper.accessor("source", {
                 header: () => <span>Source</span>,
@@ -102,7 +109,6 @@ export default class VariantNode extends BaseNode {
             }),
             columnHelper.accessor('spdi', {
                 header: () => <span>SPDI</span>,
-                cell: ({ row: { original } }) => original.rsid?.join(", ") ?? "---"
             }),
             // other columns accessed through expanded visualization
         ]

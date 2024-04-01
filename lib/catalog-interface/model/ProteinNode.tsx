@@ -6,6 +6,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { catalog } from "../catalog";
 import { preprocess } from "../helpers/format-graph-nodes";
 import BaseNode from "./_BaseNode";
+import Link from "next/link";
 
 export default class ProteinNode extends BaseNode {
     data: ProteinNodeData;
@@ -63,7 +64,11 @@ export default class ProteinNode extends BaseNode {
 
         return [
             columnHelper.accessor('_id', {
-                header: () => <span>Protein ID</span>
+                header: () => <span>Protein ID</span>,
+                cell: (cell) =>
+                    <Link href={"/" + cell.getValue()} className="underline text-brand">
+                        {cell.getValue()}
+                    </Link>
             }),
             columnHelper.accessor('name', {
                 header: () => <span>Protein Name</span>

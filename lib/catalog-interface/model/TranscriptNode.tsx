@@ -86,12 +86,20 @@ export default class TranscriptNode extends BaseNode {
             }),
             columnHelper.accessor('_id', {
                 header: () => <span>Transcript ID</span>,
+                cell: (cell) =>
+                    <Link href={"/" + cell.getValue()} className="underline text-brand">
+                        {cell.getValue()}
+                    </Link>
             }),
             columnHelper.accessor('transcript_name', {
                 header: () => <span>Transcript Name</span>,
             }),
             columnHelper.accessor("gene_name", {
                 header: () => <span>Gene Name</span>,
+                cell: (cell) =>
+                    <Link href={"/" + cell.getValue()} className="underline text-brand">
+                        {cell.getValue()}
+                    </Link>
             }),
             columnHelper.accessor("source", {
                 header: () => <span>Source</span>,

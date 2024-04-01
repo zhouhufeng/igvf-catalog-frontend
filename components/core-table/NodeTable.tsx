@@ -9,6 +9,7 @@ import { GraphNode, NodeType } from "@/lib/types/derived-types";
 import { useQuery } from "@tanstack/react-query";
 import { groupGraphNodes } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 import Loading from "@/app/[node_id]/loading";
+import BaseNode from "@/lib/catalog-interface/model/_BaseNode";
 
 export default function NodeTable({
     node_id,
@@ -21,6 +22,7 @@ export default function NodeTable({
         columns: ColumnDef<any, any>[];
         fetchNextTypePage: (type?: NodeType) => (page?: number) => Promise<CoreTableStateData<any>[]>;
         fetchInitialPage: () => Promise<GraphNode[]>;
+        model: typeof BaseNode;
     }>(() => {
         const model = catalog.node(node_id);
 
@@ -40,7 +42,8 @@ export default function NodeTable({
                 if (!resp) throw new Error("Failed to fetch data");
 
                 return resp.map(r => r.serialize());
-            }
+            },
+            model
         }
     }, [node_id]);
 
@@ -52,10 +55,12 @@ export default function NodeTable({
         }
     });
 
-    if (!data) return <Loading />;
+    if (!data) return <div className="flex items-center justify-center w-[80vw] h-[80vh]">
+        <Loading />
+    </div>
 
     return (
-        data.map(group => {
+        data.map((group, idx) => {
             const convert = group.nodes.map<CoreTableStateData<any>>(n => {
                 const model = catalog.deserialize(n);
 
@@ -68,13 +73,21 @@ export default function NodeTable({
             const cols = catalog.deserializeToStatic(group.nodes[0]).getTableColumns();
 
             return (
-                <CoreTable
-                    key={group.node_type}
-                    initialData={convert}
-                    fetchNextPage={node.fetchNextTypePage(group.node_type)}
-                    depth={depth ?? 0}
-                    columns={cols}
-                />
+                <div key={group.node_type}>
+                    {idx !== 0 && <div className="border-t border-t-gray-600 my-4"></div>}
+                    <h1 className="text-xl font-bold text-gray-600 mb-4">
+                        Linked
+                        <span className="capitalize"> {group.node_type + "s"}</span>
+                    </h1>
+                    <CoreTable
+                        key={group.node_type}
+                        initialData={convert}
+                        fetchNextPage={node.fetchNextTypePage(group.node_type)}
+                        filterNodeType={group.node_type}
+                        depth={depth ?? 0}
+                        columns={cols}
+                    />
+                </div>
             )
         })
     )
