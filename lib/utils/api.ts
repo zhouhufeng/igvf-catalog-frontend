@@ -1,6 +1,7 @@
-import { type igvfCatalogRouter as AppRouter } from 'igvf-catalog/src/routers/_app';
-import { createTRPCProxyClient, httpBatchLink, loggerLink } from '@trpc/client';
-import { type inferRouterInputs, type inferRouterOutputs } from '@trpc/server';
+import { createTRPCProxyClient, httpBatchLink, loggerLink, TRPCLink } from '@trpc/client';
+import { inferRouterInputs, inferRouterOutputs } from '@trpc/server';
+import { observable } from '@trpc/server/observable';
+import { igvfCatalogRouter as AppRouter } from 'igvf-catalog/src/routers/_app';
 
 export const apiBaseUrl = "https://api.catalog.igvf.org/api";
 
@@ -15,8 +16,8 @@ export const api = createTRPCProxyClient<AppRouter>({
         }),
         httpBatchLink({
             url: trpcBaseUrl,
-        })
-    ]
+        }),
+    ],
 });
 
 /**

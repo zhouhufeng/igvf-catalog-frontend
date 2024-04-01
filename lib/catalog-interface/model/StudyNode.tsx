@@ -1,8 +1,9 @@
 import { GeneNodeData, GraphNode, StudyNodeData } from "@/lib/types/derived-types";
-import BaseNode from "./_BaseNode";
 import { ParsedProperties } from "@/lib/types/graph-model-types";
-import { preprocess } from "../helpers/format-graph-nodes";
+import { createColumnHelper } from "@tanstack/react-table";
 
+import { preprocess } from "../helpers/format-graph-nodes";
+import BaseNode from "./_BaseNode";
 
 export default class StudyNode extends BaseNode {
     data: StudyNodeData;
