@@ -2,6 +2,8 @@ import { DrugNodeData, GeneNodeData, GraphNode, ProteinNodeData, VariantNodeData
 import { GetAdjacentOptions, ParsedProperties } from "@/lib/types/graph-model-types";
 import { api } from "@/lib/utils/api";
 import { single } from "@/lib/utils/utils";
+import { createColumnHelper } from "@tanstack/react-table";
+import Link from "next/link";
 
 import BaseNode from "../_BaseNode";
 import { catalog } from "../../catalog";
@@ -72,6 +74,44 @@ export default class VariantNode extends BaseNode {
         const variants = await api.variants.query({ region }).then(v => v.map(n => ({ variant: n })));
 
         return variants.map(catalog.deserialize);
+    }
+
+    static getTableColumns() {
+        const columnHelper = createColumnHelper<VariantNodeData & { [key: string]: any; }>();
+
+        return [
+            columnHelper.accessor('region', {
+                header: () => <span>Region</span>,
+                cell: ({ row: { original } }) => {
+                    const position = original.pos || original['pos:long']
+                    return <Link href={`/region/${original.chr}:${position}-${position}`} className="underline text-brand">
+                        {`${original.chr}:${position}`}
+                    </Link>
+                }
+            }),
+            columnHelper.accessor('rsid', {
+                header: () => <span>rsID</span>,
+                cell: ({ row: { original } }) =>
+                    original.rsid ? (
+                        original.rsid.map((id, idx) => (
+                            <Link href={"/" + id} className="underline text-brand">
+                                {id + (idx !== original.rsid!.length - 1 ? ", " : "")}
+                            </Link>
+                        ))
+                    ) : "---"
+            }),
+            columnHelper.accessor("source", {
+                header: () => <span>Source</span>,
+                cell: ({ row: { original } }) =>
+                    original.source_url ? (
+                        <a href={original.source_url} target="_blank" className="underline text-brand">{original.source}</a>
+                    ) : original.source
+            }),
+            columnHelper.accessor('spdi', {
+                header: () => <span>SPDI</span>,
+            }),
+            // other columns accessed through expanded visualization
+        ]
     }
 
     excludedColumns: null | string[] = ["alt", "ref", "_key", "_rev", "qual", "format"]

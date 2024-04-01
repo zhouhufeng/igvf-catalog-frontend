@@ -58,7 +58,6 @@ interface Spdi {
 const versionedRegex = /NC_\d+\.\d+:\d+:[A-Z]:[A-Z]/;
 const simplifiedRegex = /^(\d+)_(\d+)_([A-Z])_([A-Z])$/;
 
-
 function parseSPDI(spdi: string): Spdi | null {
     const match = spdi.match(simplifiedRegex);
 

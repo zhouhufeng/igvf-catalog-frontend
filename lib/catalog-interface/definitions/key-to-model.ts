@@ -4,7 +4,7 @@ import BaseNode from "../model/_BaseNode"
 import GeneNode from "../model/GeneNode"
 import ProteinNode from "../model/ProteinNode";
 import TranscriptNode from "../model/TranscriptNode";
-import VariantNode from "../model/variant/VariantNode";
+import VariantNode from "../model/variant-group/VariantNode";
 import DiseaseNode from "../model/DiseaseNode";
 import DrugNode from "../model/DrugNode";
 import StudyNode from "../model/StudyNode";

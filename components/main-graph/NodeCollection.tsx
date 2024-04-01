@@ -1,19 +1,22 @@
 import { TableGraphNode } from "@/app/_redux/slices/graphSlice";
 import { catalog } from "@/lib/catalog-interface/catalog";
-import { NodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
+import { TableNodeTypeGroup } from "@/lib/catalog-interface/helpers/format-graph-nodes";
 
 import GraphContainer from "./GraphContainer";
 import InternalCollectionTable from "./InternalCollectionTable";
 import { checkFiltersOnNode } from "@/lib/catalog-interface/helpers/apply-filter";
 import { useAppSelector } from "@/app/_redux/hooks";
 import { selectFilters } from "@/app/_redux/slices/querySlice";
+import { MainGraphLocation } from "./main-graph-types";
 
 export default function NodeCollection({
     group,
-    parentPath
+    parentPath,
+    location,
 }: {
-    group: NodeTypeGroup;
-    parentPath: string[]
+    group: TableNodeTypeGroup;
+    parentPath: string[];
+    location?: MainGraphLocation;
 }) {
     const filters = useAppSelector(selectFilters);
 
@@ -79,7 +82,7 @@ export default function NodeCollection({
 
     return (
         <div className="pl-1">
-            <p><span className="capitalize">{group.node_type}s</span> linked to {parentPath[parentPath.length - 1]} ({`${count}` + (filters.some(f => f.nodeType === group.node_type) ? " after filter" : "")})</p>
+            <p><span className="capitalize">{group.node_type}s</span> {location === "region" ? " within region " : " linked to "} {parentPath[parentPath.length - 1]} ({`${count}` + (filters.some(f => f.nodeType === group.node_type) ? " after filter" : "")})</p>
             {elements}
         </div>
     );
